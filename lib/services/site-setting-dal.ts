@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
-import type { SiteSetting } from "@/generated/prisma";
+import type { SiteSetting } from "@/generated/prisma/client";
 
 export interface SiteSettingsData {
   id?: string;
