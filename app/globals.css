@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-color: var(--border-color);
+
+  --font-arabic: var(--font-arabic);
+}
+
+:root {
+  --primary: #1F294A;
+  --primary-dark: #151C34;
+  --secondary: #C2704B;
+  --secondary-light: #D69A7E;
+  --background: #F8F6F3;
+  --surface: #FFFFFF;
+  --text-main: #252A35;
+  --text-muted: #747986;
+  --border-color: #E8E3DE;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-main);
+  font-family: var(--font-arabic), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Subtle modern geometric background texture */
+.bg-arabesque-subtle {
+  background-image: radial-gradient(rgba(194, 112, 75, 0.07) 1px, transparent 1px), radial-gradient(rgba(31, 41, 74, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+@keyframes masamer-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.masamer-parallax {
+  background-attachment: scroll;
+}
+
+.masamer-float-slow {
+  animation: masamer-float 7s ease-in-out infinite;
+}
+
+@media (min-width: 1024px) {
+  .masamer-parallax {
+    background-attachment: fixed;
+  }
+}
+
+/* Respect user's reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .masamer-parallax {
+    background-attachment: scroll !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

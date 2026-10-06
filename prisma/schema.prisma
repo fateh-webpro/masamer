@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Service {
+  id               String           @id @default(cuid())
+  slug             String           @unique @db.VarChar(120)
+  title            String           @db.VarChar(180)
+  shortDescription String           @db.VarChar(300)
+  fullDescription  String           @db.Text
+  icon             String           @default("Coffee") @db.VarChar(50)
+  coverImagePath   String?          @db.VarChar(255)
+  features         Json             @default("[]")
+  isActive         Boolean          @default(true)
+  sortOrder        Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  images           ServiceImage[]
+  requests         ServiceRequest[]
+
+  @@index([isActive, sortOrder])
+  @@map("services")
+}
+
+model ServiceImage {
+  id        String   @id @default(cuid())
+  serviceId String
+  imagePath String   @db.VarChar(255)
+  altText   String?  @db.VarChar(200)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  service   Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([serviceId, sortOrder])
+  @@map("service_images")
+}
+
+model ServiceRequest {
+  id           String    @id @default(cuid())
+  serviceId    String
+  customerName String    @db.VarChar(120)
+  phone        String    @db.VarChar(50)
+  eventDate    DateTime? @db.Date
+  city         String    @db.VarChar(100)
+  location     String?   @db.VarChar(255)
+  guestCount   String?   @db.VarChar(50)
+  notes        String?   @db.Text
+  status       String    @default("new") @db.VarChar(30)
+  adminNotes   String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  service      Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([serviceId])
+  @@map("service_requests")
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique @db.VarChar(191)
+  name         String    @db.VarChar(100)
+  passwordHash String    @db.VarChar(255)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@map("admin_users")
+}
+
+model SiteSetting {
+  id                          String   @id @default(cuid())
+  siteName                    String   @default("مسامر") @db.VarChar(120)
+  siteNameEn                  String?  @default("MASAMER") @db.VarChar(120)
+  shortDescription            String?  @db.VarChar(300)
+  logoPath                    String?  @db.VarChar(255)
+  logoDarkPath                String?  @db.VarChar(255)
+  faviconPath                 String?  @db.VarChar(255)
+  homeHeroBackgroundPath      String?  @db.VarChar(255)
+  homeHeroCardBackgroundPath  String?  @db.VarChar(255)
+  homeStandardsBackgroundPath String?  @db.VarChar(255)
+  worksCtaBackgroundPath      String?  @db.VarChar(255)
+  aboutBackgroundPath         String?  @db.VarChar(255)
+  contactBackgroundPath       String?  @db.VarChar(255)
+  requestBackgroundPath       String?  @db.VarChar(255)
+  ctaBackgroundPath           String?  @db.VarChar(255)
+  phone                       String?  @db.VarChar(50)
+  whatsapp                    String?  @db.VarChar(50)
+  email                       String?  @db.VarChar(120)
+  address                     String?  @db.VarChar(255)
+  facebookUrl                 String?  @db.VarChar(255)
+  xUrl                        String?  @db.VarChar(255)
+  instagramUrl                String?  @db.VarChar(255)
+  snapchatUrl                 String?  @db.VarChar(255)
+  heroBadge                   String?  @db.VarChar(150)
+  heroTitle                   String?  @db.VarChar(200)
+  heroHighlightedText         String?  @db.VarChar(200)
+  heroDescription             String?  @db.Text
+  heroPrimaryButtonText       String?  @db.VarChar(80)
+  heroSecondaryButtonText     String?  @db.VarChar(80)
+  footerDescription           String?  @db.VarChar(500)
+  copyrightText               String?  @db.VarChar(255)
+  seoTitle                    String?  @db.VarChar(200)
+  seoDescription              String?  @db.VarChar(400)
+  seoImagePath                String?  @db.VarChar(255)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model PortfolioCategory {
+  id          String          @id @default(cuid())
+  name        String          @db.VarChar(120)
+  slug        String          @unique @db.VarChar(120)
+  description String?         @db.VarChar(300)
+  isActive    Boolean         @default(true)
+  sortOrder   Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  items       PortfolioItem[]
+
+  @@index([isActive, sortOrder])
+  @@map("portfolio_categories")
+}
+
+model PortfolioItem {
+  id               String            @id @default(cuid())
+  categoryId       String
+  title            String            @db.VarChar(180)
+  slug             String            @unique @db.VarChar(120)
+  shortDescription String            @db.VarChar(300)
+  description      String?           @db.Text
+  coverImagePath   String            @db.VarChar(255)
+  isFeatured       Boolean           @default(false)
+  isActive         Boolean           @default(true)
+  sortOrder        Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  category         PortfolioCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images           PortfolioImage[]
+
+  @@index([categoryId, isActive, sortOrder])
+  @@index([isFeatured, isActive])
+  @@map("portfolio_items")
+}
+
+model PortfolioImage {
+  id              String        @id @default(cuid())
+  portfolioItemId String
+  imagePath       String        @db.VarChar(255)
+  altText         String?       @db.VarChar(200)
+  sortOrder       Int           @default(0)
+  createdAt       DateTime      @default(now())
+  item            PortfolioItem @relation(fields: [portfolioItemId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioItemId, sortOrder])
+  @@map("portfolio_images")
+}

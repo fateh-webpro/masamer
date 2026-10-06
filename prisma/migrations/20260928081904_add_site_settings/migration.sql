@@ -1,0 +1,33 @@
+-- CreateTable
+CREATE TABLE `site_settings` (
+    `id` VARCHAR(191) NOT NULL,
+    `siteName` VARCHAR(120) NOT NULL DEFAULT 'مسامر',
+    `siteNameEn` VARCHAR(120) NULL DEFAULT 'MASAMER',
+    `shortDescription` VARCHAR(300) NULL,
+    `logoPath` VARCHAR(255) NULL,
+    `logoDarkPath` VARCHAR(255) NULL,
+    `faviconPath` VARCHAR(255) NULL,
+    `phone` VARCHAR(50) NULL,
+    `whatsapp` VARCHAR(50) NULL,
+    `email` VARCHAR(120) NULL,
+    `address` VARCHAR(255) NULL,
+    `instagramUrl` VARCHAR(255) NULL,
+    `xUrl` VARCHAR(255) NULL,
+    `snapchatUrl` VARCHAR(255) NULL,
+    `tiktokUrl` VARCHAR(255) NULL,
+    `heroBadge` VARCHAR(150) NULL,
+    `heroTitle` VARCHAR(200) NULL,
+    `heroHighlightedText` VARCHAR(200) NULL,
+    `heroDescription` TEXT NULL,
+    `heroPrimaryButtonText` VARCHAR(80) NULL,
+    `heroSecondaryButtonText` VARCHAR(80) NULL,
+    `footerDescription` VARCHAR(500) NULL,
+    `copyrightText` VARCHAR(255) NULL,
+    `seoTitle` VARCHAR(200) NULL,
+    `seoDescription` VARCHAR(400) NULL,
+    `seoImagePath` VARCHAR(255) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
