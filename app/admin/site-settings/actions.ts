@@ -69,11 +69,15 @@ export async function updateSiteSettingsAction(
 
   let newLogoPath: string | null = null;
   let newLogoDarkPath: string | null = null;
+  let newFaviconPath: string | null = null;
+  let newSeoImagePath: string | null = null;
   const newBackgroundPaths: Partial<Record<BackgroundPathKey, string>> = {};
   const cleanupNewUploads = async () => {
     await Promise.all([
       deleteUploadedFile(newLogoPath, "site"),
       deleteUploadedFile(newLogoDarkPath, "site"),
+      deleteUploadedFile(newFaviconPath, "site"),
+      deleteUploadedFile(newSeoImagePath, "site"),
       ...Object.values(newBackgroundPaths).map((filePath) =>
         deleteUploadedFile(filePath, "site-backgrounds")
       ),
@@ -135,7 +139,6 @@ export async function updateSiteSettingsAction(
         allowedMimeTypes: ["image/png", "image/webp", "image/x-icon", "image/vnd.microsoft.icon"],
         allowedExtensions: [".png", ".webp", ".ico"],
         maxSizeBytes: 1 * 1024 * 1024,
-        previousFilePath: existing?.faviconPath,
       });
 
       if (!uploadRes.success) {
@@ -146,6 +149,7 @@ export async function updateSiteSettingsAction(
         };
       }
       faviconPath = uploadRes.filePath || null;
+      newFaviconPath = faviconPath;
     }
 
     // 6. Process SEO Image upload if provided
@@ -156,7 +160,6 @@ export async function updateSiteSettingsAction(
         allowedMimeTypes: ["image/png", "image/webp", "image/jpeg"],
         allowedExtensions: [".png", ".webp", ".jpg", ".jpeg"],
         maxSizeBytes: 5 * 1024 * 1024,
-        previousFilePath: existing?.seoImagePath,
       });
 
       if (!uploadRes.success) {
@@ -167,6 +170,7 @@ export async function updateSiteSettingsAction(
         };
       }
       seoImagePath = uploadRes.filePath || null;
+      newSeoImagePath = seoImagePath;
     }
 
     for (const upload of backgroundUploads) {
@@ -217,6 +221,12 @@ export async function updateSiteSettingsAction(
     }
     if (newLogoDarkPath && existing?.logoDarkPath) {
       await deleteUploadedFile(existing.logoDarkPath, "site");
+    }
+    if (newFaviconPath && existing?.faviconPath) {
+      await deleteUploadedFile(existing.faviconPath, "site");
+    }
+    if (newSeoImagePath && existing?.seoImagePath) {
+      await deleteUploadedFile(existing.seoImagePath, "site");
     }
     for (const upload of backgroundUploads) {
       const newPath = newBackgroundPaths[upload.pathKey];

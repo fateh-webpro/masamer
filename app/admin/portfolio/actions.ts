@@ -145,9 +145,17 @@ export async function createPortfolioItemAction(
       maxSizeBytes: PORTFOLIO_MAX_SIZE,
     });
 
-    if (uploadRes.success && uploadRes.filePath) {
-      uploadedGalleryPaths.push(uploadRes.filePath);
+    if (!uploadRes.success || !uploadRes.filePath) {
+      await Promise.all([
+        deleteUploadedFile(coverImagePath, "portfolio"),
+        ...uploadedGalleryPaths.map((filePath) => deleteUploadedFile(filePath, "portfolio")),
+      ]);
+      return {
+        fieldErrors: { additionalImages: [uploadRes.error || "تعذر رفع إحدى صور المعرض"] },
+        error: uploadRes.error || "تعذر رفع جميع صور المعرض",
+      };
     }
+    uploadedGalleryPaths.push(uploadRes.filePath);
   }
 
   try {
@@ -315,9 +323,19 @@ export async function updatePortfolioItemAction(
       maxSizeBytes: PORTFOLIO_MAX_SIZE,
     });
 
-    if (uploadRes.success && uploadRes.filePath) {
-      newlyUploadedGalleryPaths.push(uploadRes.filePath);
+    if (!uploadRes.success || !uploadRes.filePath) {
+      await Promise.all([
+        ...(oldCoverToDelete && coverImagePath !== existingItem.coverImagePath
+          ? [deleteUploadedFile(coverImagePath, "portfolio")]
+          : []),
+        ...newlyUploadedGalleryPaths.map((filePath) => deleteUploadedFile(filePath, "portfolio")),
+      ]);
+      return {
+        fieldErrors: { additionalImages: [uploadRes.error || "تعذر رفع إحدى صور المعرض"] },
+        error: uploadRes.error || "تعذر رفع جميع صور المعرض",
+      };
     }
+    newlyUploadedGalleryPaths.push(uploadRes.filePath);
   }
 
   try {
