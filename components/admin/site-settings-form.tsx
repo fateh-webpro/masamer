@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { updateSiteSettingsAction, SiteSettingsFormState } from "@/app/admin/site-settings/actions";
 import type { SiteSettingsData } from "@/lib/services/site-setting-dal";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface SiteSettingsFormProps {
   initialData: SiteSettingsData;
@@ -41,7 +42,7 @@ function BackgroundUploadCard({ id, title, description, preview, onChange }: Bac
       </div>
       <div className="relative aspect-video rounded-xl overflow-hidden bg-white border border-slate-200">
         {preview ? (
-          <Image src={preview} alt={`معاينة ${title}`} fill sizes="(min-width: 768px) 420px, 90vw" className="object-cover" />
+          <Image src={preview} alt={`معاينة ${title}`} fill sizes="(min-width: 768px) 420px, 90vw" className="object-cover" unoptimized={isRuntimeUploadPath(preview)} />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
             <ImageIcon className="w-7 h-7 mb-2" />
@@ -229,6 +230,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
                       alt="شعار الموقع"
                       width={70}
                       height={70}
+                      unoptimized={isRuntimeUploadPath(logoPreview)}
                       className="object-contain max-h-16 max-w-16"
                     />
                   ) : (
@@ -272,6 +274,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
                       alt="شعار الخلفيات الداكنة"
                       width={70}
                       height={70}
+                      unoptimized={isRuntimeUploadPath(logoDarkPreview)}
                       className="object-contain max-h-16 max-w-16"
                     />
                   ) : (
@@ -315,6 +318,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
                       alt="Favicon"
                       width={32}
                       height={32}
+                      unoptimized={isRuntimeUploadPath(faviconPreview)}
                       className="object-contain"
                     />
                   ) : (
@@ -772,6 +776,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
                       alt="SEO Share Preview"
                       fill
                       className="object-cover"
+                      unoptimized={isRuntimeUploadPath(seoImagePreview)}
                     />
                   ) : (
                     <div className="text-center p-2">

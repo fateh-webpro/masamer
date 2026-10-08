@@ -10,9 +10,10 @@ import {
 } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { footerLinks } from "@/config/navigation";
-import { formatWhatsAppUrl } from "@/lib/utils";
+import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import type { SiteSettingsData } from "@/lib/services/site-setting-dal";
 import { SocialIcon, type SocialPlatform } from "@/components/shared/social-icon";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 
 interface FooterProps {
   settings?: SiteSettingsData;
@@ -54,6 +55,7 @@ export function Footer({ settings }: FooterProps) {
                       alt={siteName}
                       width={140}
                       height={40}
+                      unoptimized={isRuntimeUploadPath(logoPath)}
                       className="h-10 w-auto object-contain brightness-110"
                     />
                   </div>
@@ -74,18 +76,18 @@ export function Footer({ settings }: FooterProps) {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="h-11 w-11 rounded-lg bg-white/5 hover:bg-[#C2704B] text-white/80 hover:text-white flex items-center justify-center transition-colors duration-200 border border-white/10"
+                    className="group flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 transition-[color,background-color,border-color] duration-250 hover:border-[#C2704B]/50 hover:bg-white/10 hover:text-[#C2704B] active:text-[#C2704B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2704B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#151C34] focus-visible:text-[#C2704B]"
                     aria-label={social.title}
                   >
-                    <SocialIcon platform={social.platform} className="h-5 w-5" />
+                    <SocialIcon platform={social.platform} className="h-5 w-5 transition-[color,transform] duration-250 group-hover:scale-110 group-hover:text-[#C2704B] group-active:scale-[0.97] group-active:text-[#C2704B] group-focus-visible:scale-110 group-focus-visible:text-[#C2704B] motion-reduce:transform-none motion-reduce:transition-none" />
                   </a>
                 ) : (
                   <span
                     key={social.title}
-                    className="h-11 w-11 rounded-lg bg-white/5 text-white/40 flex items-center justify-center border border-white/10 cursor-default"
+                    className="group flex h-11 w-11 cursor-default items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40 transition-[color,background-color,border-color] duration-250 hover:border-[#C2704B]/40 hover:bg-white/10 hover:text-[#C2704B]"
                     aria-label={`${social.title} — الرابط غير متوفر`}
                   >
-                    <SocialIcon platform={social.platform} className="h-5 w-5" />
+                    <SocialIcon platform={social.platform} className="h-5 w-5 transition-[color,transform] duration-250 group-hover:scale-110 group-hover:text-[#C2704B] motion-reduce:transform-none motion-reduce:transition-none" />
                   </span>
                 ))}
               </div>
@@ -108,6 +110,9 @@ export function Footer({ settings }: FooterProps) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <RequestModalTrigger className="text-white/70 hover:text-white transition-colors flex items-center gap-1.5">اطلب الخدمة</RequestModalTrigger>
+              </li>
             </ul>
           </div>
 

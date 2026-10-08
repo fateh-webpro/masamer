@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { ArrowLeft, Award, Coffee, HeartHandshake, ShieldCheck, Sparkles } from "lucide-react";
 import { PublicPageShell } from "@/components/layout/public-page-shell";
 import { MasamerDiamondMotif, MasamerFlourish } from "@/components/shared/decorative-pattern";
 import { Reveal } from "@/components/shared/reveal";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 
 export const metadata: Metadata = {
   title: "من نحن",
@@ -123,13 +123,12 @@ export default async function AboutPage() {
           <div className="pointer-events-none absolute -bottom-24 -left-20 h-48 w-48 rounded-full bg-[#C2704B]/15 blur-3xl" aria-hidden="true" />
           <div className="relative">
             <h2 className="text-3xl font-bold text-[#F8F6F3]">دعنا نرتب ضيافتك</h2>
-            <Link
-              href="/request"
+            <RequestModalTrigger
               className="mt-6 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#C2704B] px-7 py-3 text-[1.1875rem] font-bold text-white shadow-sm transition-colors duration-200 hover:bg-[#A95F3F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D69A7E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1F294A] motion-reduce:transition-none"
             >
               <span>اطلب الخدمة</span>
               <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
-            </Link>
+            </RequestModalTrigger>
           </div>
         </Reveal>
       </section>

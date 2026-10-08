@@ -233,7 +233,6 @@ export async function updateSiteSettingsAction(
       revalidatePath("/admin/site-settings");
       if (newBackgroundPaths.aboutBackgroundPath) revalidatePath("/about");
       if (newBackgroundPaths.contactBackgroundPath) revalidatePath("/contact");
-      if (newBackgroundPaths.requestBackgroundPath) revalidatePath("/request");
       if (newBackgroundPaths.worksCtaBackgroundPath) revalidatePath("/works");
     } catch (revalErr) {
       console.error("Revalidation error:", revalErr);

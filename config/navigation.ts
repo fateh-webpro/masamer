@@ -4,6 +4,6 @@ export const mainNav: NavItem[] = [
   { title: "من نحن", href: "/about" }, { title: "تواصل معنا", href: "/contact" },
 ];
 export const footerLinks = {
-  services: [{ title: "خدماتنا", href: "/services" }, { title: "أعمالنا", href: "/works" }, { title: "اطلب الخدمة", href: "/request" }],
+  services: [{ title: "خدماتنا", href: "/services" }, { title: "أعمالنا", href: "/works" }],
   company: [{ title: "عن مسامر", href: "/about" }, { title: "تواصل معنا", href: "/contact" }],
 };

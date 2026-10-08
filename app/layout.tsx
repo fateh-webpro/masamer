@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const ogImage = settings.seoImagePath || "/og-image.jpg";
 
   return {
-    metadataBase: new URL("https://masamer.sa"),
+    metadataBase: new URL("https://masamersa.com"),
     title: {
       default: title,
       template: `%s | ${settings.siteName || siteConfig.name}`,
@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "ar_SA",
-      url: "https://masamer.sa",
+      url: "https://masamersa.com",
       title,
       description,
       siteName: settings.siteName || siteConfig.name,

@@ -6,6 +6,7 @@ import { PlusCircle, FolderTree, Star, ImageIcon, ExternalLink } from "lucide-re
 import { getAllPortfolioItemsForAdmin } from "@/lib/services/portfolio-dal";
 import { PortfolioTableActions } from "@/components/admin/portfolio-table-actions";
 import { Button } from "@/components/ui/button";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "معرض الأعمال | لوحة التحكم - مسامر",
@@ -86,6 +87,7 @@ export default async function AdminPortfolioPage() {
                             alt={item.title}
                             fill
                             className="object-cover"
+                            unoptimized={isRuntimeUploadPath(item.coverImagePath)}
                           />
                         </div>
                         <div className="min-w-0">

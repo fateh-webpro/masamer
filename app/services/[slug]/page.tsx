@@ -15,9 +15,10 @@ import {
 import { getServiceBySlug, getActiveServices, getServiceDisplayImage } from "@/lib/services/service-dal";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { ServiceIcon } from "@/components/shared/service-icon";
-import { Button } from "@/components/ui/button";
-import { formatWhatsAppUrl } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import { SharedGalleryLightbox } from "@/components/shared/gallery-lightbox";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 
 interface ServicePageProps {
   params: Promise<{
@@ -111,13 +112,13 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           {/* Main Service Details (2 Cols) */}
           <div className="lg:col-span-2 space-y-8">
             <div className="relative min-h-105 sm:min-h-120 rounded-3xl overflow-hidden border border-[#E8E3DE] bg-[#1F294A]">
-              {displayImage ? <Image src={displayImage} alt={service.title} fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 800px" /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle flex items-center justify-center text-[#E7C8B7]"><ServiceIcon name={service.icon} className="w-20 h-20 opacity-80" /></div>}
+              {displayImage ? <Image src={displayImage} alt={service.title} fill priority className="object-cover" sizes="(max-width: 1024px) 100vw, 800px" unoptimized={isRuntimeUploadPath(displayImage)} /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle flex items-center justify-center text-[#E7C8B7]"><ServiceIcon name={service.icon} className="w-20 h-20 opacity-80" /></div>}
               <div className="absolute inset-0 bg-linear-to-t from-[#1F294A]/95 via-[#1F294A]/35 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10 text-white">
                 <div className="w-12 h-12 rounded-xl border border-white/20 bg-[#1F294A]/70 text-[#E7C8B7] flex items-center justify-center mb-5 backdrop-blur-sm"><ServiceIcon name={service.icon} className="w-6 h-6" /></div>
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">{service.title}</h1>
                 <p className="mt-4 max-w-2xl text-sm sm:text-lg text-white/85 leading-relaxed">{service.shortDescription}</p>
-                <Link href={`/request?service=${service.slug}`} className="mt-6 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#C2704B] px-6 py-3 text-sm font-bold text-white hover:bg-[#A95F40] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><span>اطلب الخدمة</span><ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" /></Link>
+                <RequestModalTrigger serviceSlug={service.slug} className="mt-6 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#C2704B] px-6 py-3 text-sm font-bold text-white hover:bg-[#A95F40] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><span>اطلب الخدمة</span><ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" /></RequestModalTrigger>
               </div>
             </div>
 
@@ -185,7 +186,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 </div>
               </div>
 
-              <Button asChild variant="secondary" size="lg" className="w-full text-base font-bold mb-3"><Link href={`/request?service=${service.slug}`}>اطلب الخدمة</Link></Button>
+              <RequestModalTrigger serviceSlug={service.slug} className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full text-base font-bold mb-3" })}>اطلب الخدمة</RequestModalTrigger>
               <Button
                 asChild
                 variant="secondary"

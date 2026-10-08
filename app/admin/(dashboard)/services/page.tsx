@@ -12,6 +12,7 @@ import { getAllServicesForAdmin, getServiceDisplayImage } from "@/lib/services/s
 import { Button } from "@/components/ui/button";
 import { ServiceIcon } from "@/components/shared/service-icon";
 import { ServiceTableActions } from "@/components/admin/service-table-actions";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +83,7 @@ export default async function AdminServicesPage() {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3.5">
                         <div className="relative w-14 h-12 rounded-xl bg-[#1F294A] border border-[#E8E3DE] flex items-center justify-center text-[#E7C8B7] shrink-0 overflow-hidden">
-                          {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="56px" className="object-cover" /> : <ServiceIcon name={service.icon} className="w-5 h-5" />}
+                          {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="56px" className="object-cover" unoptimized={isRuntimeUploadPath(displayImage)} /> : <ServiceIcon name={service.icon} className="w-5 h-5" />}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">

@@ -5,6 +5,7 @@ import { ArrowLeft, Sparkles } from "lucide-react";
 import { ServiceIcon } from "@/components/shared/service-icon";
 import { Button } from "@/components/ui/button";
 import { getServiceDisplayImage, type ServiceItem } from "@/lib/services/service-dal";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface ServicesSectionProps {
   services: ServiceItem[];
@@ -56,7 +57,7 @@ export function ServicesSection({ services }: ServicesSectionProps) {
               className="group relative bg-white rounded-3xl border border-[#E8E3DE] hover:border-[#C2704B]/55 flex flex-col transition-all duration-300 motion-reduce:transition-none hover:shadow-lg hover:shadow-[#1F294A]/8 hover:-translate-y-1 motion-reduce:hover:translate-y-0 overflow-hidden"
             >
               <Link href={`/services/${service.slug}`} className="relative aspect-16/9 overflow-hidden bg-[#1F294A]">
-                {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw" className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.03] motion-reduce:group-hover:scale-100" /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle" />}
+                {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw" className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.03] motion-reduce:group-hover:scale-100" unoptimized={isRuntimeUploadPath(displayImage)} /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle" />}
                 <div className="absolute inset-0 bg-linear-to-t from-[#1F294A]/70 via-transparent to-transparent" />
                 <span className="absolute top-3 right-3 text-[11px] font-bold text-white/85">{String(index + 1).padStart(2, "0")}</span>
                 <span className="absolute bottom-3 right-3 w-10 h-10 rounded-xl border border-white/20 bg-[#1F294A]/70 text-[#E7C8B7] backdrop-blur-sm flex items-center justify-center"><ServiceIcon name={service.icon} className="w-5 h-5" /></span>

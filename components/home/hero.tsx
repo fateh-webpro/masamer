@@ -14,10 +14,12 @@ import {
   Clock,
 } from "lucide-react";
 import { siteConfig } from "@/config/site";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 import { Badge } from "@/components/ui/badge";
 import { MasamerDiamondMotif } from "@/components/shared/decorative-pattern";
 import type { SiteSettingsData } from "@/lib/services/site-setting-dal";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface HeroProps {
   settings?: SiteSettingsData;
@@ -140,7 +142,7 @@ export function Hero({ settings, featuredImage }: HeroProps) {
               variants={itemVariants}
               className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 w-full sm:w-auto"
             >
-              <Button asChild variant="secondary" size="lg" className="group shadow-sm hover:shadow-md justify-center w-full sm:w-auto h-12 px-7 font-bold text-base"><Link href="/request" className="inline-flex items-center justify-center gap-2 whitespace-nowrap"><span>{primaryBtn}</span><ArrowLeft className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-x-1" aria-hidden="true" /></Link></Button>
+              <RequestModalTrigger className={buttonVariants({ variant: "secondary", size: "lg", className: "group shadow-sm hover:shadow-md justify-center w-full sm:w-auto h-12 px-7 font-bold text-base" })}><span>{primaryBtn}</span><ArrowLeft className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:-translate-x-1" aria-hidden="true" /></RequestModalTrigger>
 
               <Button
                 variant="outline"
@@ -206,6 +208,7 @@ export function Hero({ settings, featuredImage }: HeroProps) {
                     alt="تجهيزات مسامر لخدمات الضيافة والمناسبات"
                     fill
                     sizes="(max-width: 1024px) 100vw, 500px"
+                    unoptimized={isRuntimeUploadPath(cardBackground)}
                     className="z-0 object-cover transition-transform duration-700 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     priority
                   />

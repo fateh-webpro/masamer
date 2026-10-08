@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { X, ChevronRight, ChevronLeft, Maximize2 } from "lucide-react";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 export interface GalleryImageItem {
   id: string;
@@ -91,6 +92,7 @@ export function SharedGalleryLightbox({ coverImage, additionalImages }: SharedGa
                   alt={img.altText || `صورة ${idx + 1}`}
                   fill
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  unoptimized={isRuntimeUploadPath(img.imagePath)}
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-primary-950/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -170,6 +172,7 @@ export function SharedGalleryLightbox({ coverImage, additionalImages }: SharedGa
                 alt={allImages[selectedIndex].altText || `صورة ${selectedIndex + 1}`}
                 fill
                 sizes="(max-width: 1280px) 100vw, 1200px"
+                unoptimized={isRuntimeUploadPath(allImages[selectedIndex].imagePath)}
                 className="object-contain"
                 priority
               />

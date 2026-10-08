@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { AdminLoginForm } from "./login-form";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 export default async function AdminLoginPage() {
   const settings = await getSiteSettings();
@@ -19,6 +20,7 @@ export default async function AdminLoginPage() {
                 alt={settings.siteName}
                 width={180}
                 height={56}
+                unoptimized={isRuntimeUploadPath(settings.logoPath)}
                 className="h-12 w-auto object-contain sm:h-14"
                 priority
               />

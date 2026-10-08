@@ -17,8 +17,9 @@ import {
 import { getPortfolioItemBySlug, getActivePortfolioItems } from "@/lib/services/portfolio-dal";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { GalleryLightbox } from "@/components/portfolio/gallery-lightbox";
-import { formatWhatsAppUrl } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 
 interface WorkDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -125,6 +126,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
                   alt={item.title}
                   fill
                   sizes="(max-width: 1024px) 100vw, 800px"
+                  unoptimized={isRuntimeUploadPath(item.coverImagePath)}
                   className="object-cover"
                   priority
                 />
@@ -196,9 +198,7 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
                 </div>
               </div>
 
-              <Button
-                asChild variant="secondary" size="lg" className="w-full text-base font-bold h-12 mb-3"
-              ><Link href="/request">اطلب تجهيزًا مشابهًا</Link></Button>
+              <RequestModalTrigger className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full text-base font-bold h-12 mb-3" })}>اطلب تجهيزًا مشابهًا</RequestModalTrigger>
               <Button
                 asChild
                 variant="secondary"

@@ -22,6 +22,7 @@ import {
 } from "@/app/admin/portfolio/actions";
 import type { PortfolioItemData, PortfolioCategoryData } from "@/lib/services/portfolio-dal";
 import { Button } from "@/components/ui/button";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface PortfolioFormProps {
   initialData?: PortfolioItemData | null;
@@ -276,7 +277,7 @@ export function PortfolioForm({ initialData, categories, mode }: PortfolioFormPr
                   alt="معاينة صورة الغلاف"
                   fill
                   className="object-cover"
-                  unoptimized={coverPreview.startsWith("blob:")}
+                  unoptimized={coverPreview.startsWith("blob:") || isRuntimeUploadPath(coverPreview)}
                 />
                 <span className="absolute top-2 right-2 rounded-full bg-[#1F294A]/85 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">الصورة الرئيسية</span>
               </div>
@@ -356,6 +357,7 @@ export function PortfolioForm({ initialData, categories, mode }: PortfolioFormPr
                       alt={img.altText || "صورة من المعرض"}
                       fill
                       className="object-cover"
+                      unoptimized={isRuntimeUploadPath(img.imagePath)}
                     />
                     <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
                       <button

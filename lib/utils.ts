@@ -5,6 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isRuntimeUploadPath(src: string): boolean {
+  return src.startsWith("/uploads/");
+}
+
 export function formatWhatsAppUrl(phone: string, text?: string): string {
   if (!phone) return "https://wa.me/966539691477";
   const digits = phone.replace(/\D/g, "");

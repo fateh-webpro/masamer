@@ -5,6 +5,8 @@ import { ArrowLeft, CheckCircle2, Sparkles } from "lucide-react";
 import { getActiveServices, getServiceDisplayImage } from "@/lib/services/service-dal";
 import { ServiceIcon } from "@/components/shared/service-icon";
 import { Button } from "@/components/ui/button";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "خدمات الضيافة الفاخرة | مسامر",
@@ -60,7 +62,7 @@ export default async function ServicesPage() {
                 className="group relative flex flex-col bg-white rounded-2xl border border-sand-200/90 hover:border-secondary-300 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-secondary-900/5 hover:-translate-y-1"
               >
                 <div className="relative aspect-16/9 bg-primary-950 overflow-hidden">
-                  {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.03] motion-reduce:group-hover:scale-100" /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle flex items-center justify-center"><div className="w-16 h-16 rounded-2xl border border-[#C2704B]/40 bg-white/5 text-[#E7C8B7] flex items-center justify-center"><ServiceIcon name={service.icon} className="w-8 h-8" /></div></div>}
+                  {displayImage ? <Image src={displayImage} alt={service.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.03] motion-reduce:group-hover:scale-100" unoptimized={isRuntimeUploadPath(displayImage)} /> : <div className="absolute inset-0 bg-linear-to-br from-[#1F294A] to-[#29365D] bg-arabesque-subtle flex items-center justify-center"><div className="w-16 h-16 rounded-2xl border border-[#C2704B]/40 bg-white/5 text-[#E7C8B7] flex items-center justify-center"><ServiceIcon name={service.icon} className="w-8 h-8" /></div></div>}
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-[#1F294A]/55 to-transparent" aria-hidden="true" />
                   <span className="absolute top-4 right-4 rounded-full border border-white/30 bg-[#1F294A]/75 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">خدمة {String(index + 1).padStart(2, "0")}</span>
                 </div>
@@ -99,7 +101,7 @@ export default async function ServicesPage() {
                 </div>
 
                 {/* Footer Action */}
-                <div className="pt-4 mt-auto border-t border-sand-100/80 grid grid-cols-2 gap-2"><Link href={`/services/${service.slug}`} className="inline-flex items-center justify-center gap-1 rounded-xl border border-sand-200 px-3 py-2 text-sm font-semibold">تفاصيل الخدمة <ArrowLeft className="w-4 h-4" /></Link><Link href={`/request?service=${service.slug}`} className="inline-flex items-center justify-center rounded-xl bg-secondary-600 text-white px-3 py-2 text-sm font-bold">اطلب الخدمة</Link></div>
+                <div className="pt-4 mt-auto border-t border-sand-100/80 grid grid-cols-2 gap-2"><Link href={`/services/${service.slug}`} className="inline-flex items-center justify-center gap-1 rounded-xl border border-sand-200 px-3 py-2 text-sm font-semibold">تفاصيل الخدمة <ArrowLeft className="w-4 h-4" /></Link><RequestModalTrigger serviceSlug={service.slug} className="inline-flex items-center justify-center rounded-xl bg-secondary-600 text-white px-3 py-2 text-sm font-bold">اطلب الخدمة</RequestModalTrigger></div>
                 </div>
               </article>
               );

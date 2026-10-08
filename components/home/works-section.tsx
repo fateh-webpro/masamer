@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import type { PortfolioItemData } from "@/lib/services/portfolio-dal";
 import { Button } from "@/components/ui/button";
+import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface WorksSectionProps {
   featuredItems: PortfolioItemData[];
@@ -66,6 +67,7 @@ export function WorksSection({ featuredItems }: WorksSectionProps) {
                   alt={item.title}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  unoptimized={isRuntimeUploadPath(item.coverImagePath)}
                   className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.03] motion-reduce:group-hover:scale-100"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-[#1F294A]/90 via-[#1F294A]/10 to-transparent" />

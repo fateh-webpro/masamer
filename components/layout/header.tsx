@@ -7,8 +7,9 @@ import { usePathname } from "next/navigation";
 import { Menu, X, PhoneCall, ChevronLeft, MessageCircle } from "lucide-react";
 import { mainNav } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
-import { Button } from "@/components/ui/button";
-import { cn, formatWhatsAppUrl } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { RequestModalTrigger } from "@/components/request/request-modal-provider";
+import { cn, formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import type { SiteSettingsData } from "@/lib/services/site-setting-dal";
 
 interface HeaderProps {
@@ -100,6 +101,7 @@ export function Header({ settings }: HeaderProps) {
                   alt={siteName}
                   width={150}
                   height={48}
+                  unoptimized={isRuntimeUploadPath(logoPath)}
                   className="h-10 sm:h-12 w-auto object-contain"
                   priority
                 />
@@ -136,7 +138,7 @@ export function Header({ settings }: HeaderProps) {
 
           {/* Desktop Header Actions */}
           <div className="hidden sm:flex items-center gap-3">
-            <Button asChild variant="secondary" size="default" className="font-medium shadow-xs"><Link href="/request">اطلب الخدمة</Link></Button>
+            <RequestModalTrigger className={buttonVariants({ variant: "secondary", size: "default", className: "font-medium shadow-xs" })}>اطلب الخدمة</RequestModalTrigger>
           </div>
 
           {/* Mobile Menu Button */}
@@ -190,6 +192,7 @@ export function Header({ settings }: HeaderProps) {
                   alt={siteName}
                   width={150}
                   height={40}
+                  unoptimized={isRuntimeUploadPath(logoPath)}
                   className="h-10 w-auto object-contain"
                 />
               </div>
@@ -234,7 +237,7 @@ export function Header({ settings }: HeaderProps) {
 
         {/* Drawer Footer Actions */}
         <div className="p-4 sm:p-5 border-t border-(--border-color) bg-(--background)/50 space-y-3">
-          <Button asChild variant="secondary" className="w-full justify-center text-base py-3 h-12 shadow-sm font-semibold"><Link href="/request" onClick={closeMenuAndFocusTrigger}>اطلب الخدمة</Link></Button>
+          <RequestModalTrigger onClick={closeMenuAndFocusTrigger} className={buttonVariants({ variant: "secondary", className: "w-full justify-center text-base py-3 h-12 shadow-sm font-semibold" })}>اطلب الخدمة</RequestModalTrigger>
 
           <div className="flex flex-col gap-2 pt-1 text-center">
             <a
