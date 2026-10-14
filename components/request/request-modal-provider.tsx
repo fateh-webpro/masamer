@@ -6,7 +6,18 @@ import { X } from "lucide-react";
 import { RequestForm } from "@/components/request/request-form";
 import { cn } from "@/lib/utils";
 
-export type RequestServiceOption = { id: string; title: string; slug: string };
+export type RequestServiceOption = {
+  id: string;
+  title: string;
+  slug: string;
+  categoryId?: string | null;
+  categoryName?: string | null;
+};
+
+export type RequestCategoryOption = {
+  id: string;
+  name: string;
+};
 
 type RequestModalContextValue = {
   openRequestModal: (serviceSlug?: string) => void;
@@ -17,10 +28,12 @@ const RequestModalContext = React.createContext<RequestModalContextValue | null>
 export function RequestModalProvider({
   children,
   services,
+  categories,
   whatsapp,
 }: {
   children: React.ReactNode;
   services: RequestServiceOption[];
+  categories?: RequestCategoryOption[];
   whatsapp: string;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -119,6 +132,7 @@ export function RequestModalProvider({
                 <RequestForm
                   key={serviceSlug ?? "general"}
                   services={services}
+                  categories={categories}
                   selectedServiceId={selectedServiceId}
                   whatsapp={whatsapp}
                 />

@@ -7,22 +7,42 @@ datasource db {
   provider = "mysql"
 }
 
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String    @db.VarChar(120)
+  slug        String    @unique @db.VarChar(120)
+  description String?   @db.VarChar(300)
+  icon        String    @default("Coffee") @db.VarChar(50)
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  services    Service[]
+
+  @@index([isActive, sortOrder])
+  @@map("service_categories")
+}
+
 model Service {
-  id               String           @id @default(cuid())
-  slug             String           @unique @db.VarChar(120)
-  title            String           @db.VarChar(180)
-  shortDescription String           @db.VarChar(300)
-  fullDescription  String           @db.Text
-  icon             String           @default("Coffee") @db.VarChar(50)
-  coverImagePath   String?          @db.VarChar(255)
-  features         Json             @default("[]")
-  isActive         Boolean          @default(true)
-  sortOrder        Int              @default(0)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  id               String               @id @default(cuid())
+  categoryId       String?              @db.VarChar(191)
+  slug             String               @unique @db.VarChar(120)
+  title            String               @db.VarChar(180)
+  shortDescription String               @db.VarChar(300)
+  fullDescription  String               @db.Text
+  icon             String               @default("Coffee") @db.VarChar(50)
+  coverImagePath   String?              @db.VarChar(255)
+  features         Json                 @default("[]")
+  isActive         Boolean              @default(true)
+  sortOrder        Int                  @default(0)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  category         ServiceCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   images           ServiceImage[]
   requests         ServiceRequest[]
+  requestItems     ServiceRequestItem[]
 
+  @@index([categoryId, isActive, sortOrder])
   @@index([isActive, sortOrder])
   @@map("services")
 }
@@ -41,24 +61,44 @@ model ServiceImage {
 }
 
 model ServiceRequest {
-  id           String    @id @default(cuid())
-  serviceId    String
-  customerName String    @db.VarChar(120)
-  phone        String    @db.VarChar(50)
-  eventDate    DateTime? @db.Date
-  city         String    @db.VarChar(100)
-  location     String?   @db.VarChar(255)
-  guestCount   String?   @db.VarChar(50)
-  notes        String?   @db.Text
-  status       String    @default("new") @db.VarChar(30)
-  adminNotes   String?   @db.Text
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  service      Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  id            String               @id @default(cuid())
+  serviceId     String?              @db.VarChar(191)
+  customerName  String               @db.VarChar(120)
+  phone         String               @db.VarChar(50)
+  eventDate     DateTime?            @db.Date
+  city          String               @db.VarChar(100)
+  district      String?              @db.VarChar(100)
+  location      String?              @db.VarChar(255)
+  guestCount    String?              @db.VarChar(50)
+  notes         String?              @db.Text
+  customRequest String?              @db.Text
+  status        String               @default("new") @db.VarChar(30)
+  adminNotes    String?              @db.Text
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  service       Service?             @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  items         ServiceRequestItem[]
 
   @@index([status, createdAt])
   @@index([serviceId])
   @@map("service_requests")
+}
+
+model ServiceRequestItem {
+  id           String         @id @default(cuid())
+  requestId    String
+  serviceId    String?
+  serviceName  String         @db.VarChar(180)
+  categoryName String?        @db.VarChar(120)
+  quantity     Int            @default(1)
+  notes        String?        @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  request      ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  service      Service?       @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+
+  @@index([requestId])
+  @@index([serviceId])
+  @@map("service_request_items")
 }
 
 model AdminUser {
@@ -98,6 +138,7 @@ model SiteSetting {
   xUrl                        String?  @db.VarChar(255)
   instagramUrl                String?  @db.VarChar(255)
   snapchatUrl                 String?  @db.VarChar(255)
+  tiktokUrl                   String?  @db.VarChar(255)
   heroBadge                   String?  @db.VarChar(150)
   heroTitle                   String?  @db.VarChar(200)
   heroHighlightedText         String?  @db.VarChar(200)

@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
-  PhoneCall,
   ShieldCheck,
   Sparkles,
   Clock,
@@ -15,6 +14,7 @@ import {
 import { getServiceBySlug, getActiveServices, getServiceDisplayImage } from "@/lib/services/service-dal";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { ServiceIcon } from "@/components/shared/service-icon";
+import { SocialIcon } from "@/components/shared/social-icon";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import { SharedGalleryLightbox } from "@/components/shared/gallery-lightbox";
@@ -43,7 +43,21 @@ export async function generateMetadata({
   return {
     title: `${service.title} | مسامر للضيافة الفاخرة`,
     description: service.shortDescription,
-    openGraph: { title: service.title, description: service.shortDescription, ...(displayImage ? { images: [{ url: displayImage, alt: service.title }] } : {}) },
+    alternates: {
+      canonical: `https://masamersa.com/services/${service.slug}`,
+    },
+    openGraph: {
+      title: `${service.title} | مسامر`,
+      description: service.shortDescription,
+      url: `https://masamersa.com/services/${service.slug}`,
+      ...(displayImage ? { images: [{ url: displayImage, alt: service.title }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${service.title} | مسامر`,
+      description: service.shortDescription,
+      ...(displayImage ? { images: [displayImage] } : {}),
+    },
   };
 }
 
@@ -72,8 +86,31 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   const displayImage = getServiceDisplayImage(service);
   const galleryImages = service.images.filter((image) => image.imagePath !== displayImage);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.title,
+    description: service.shortDescription,
+    provider: {
+      "@type": "LocalBusiness",
+      name: settings.siteName || "مسامر",
+      url: "https://masamersa.com",
+    },
+    areaServed: [
+      { "@type": "City", name: "الرياض" },
+      { "@type": "City", name: "جدة" },
+      { "@type": "City", name: "الدمام" },
+    ],
+    url: `https://masamersa.com/services/${service.slug}`,
+    ...(displayImage ? { image: displayImage } : {}),
+  };
+
   return (
     <div className="min-h-screen bg-sand-50/50 pb-24 pt-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-8">
@@ -159,52 +196,83 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
           </div>
 
           {/* Sidebar / Quick Inquiry Card (1 Col) */}
-          <div className="space-y-6">
-            <div className="bg-primary-950 text-white rounded-3xl p-8 border border-primary-900 shadow-xl sticky top-28">
-              <span className="inline-block px-3 py-1 rounded-full bg-secondary-900/60 text-secondary-300 text-xs font-semibold mb-4 border border-secondary-800">
-                طلب الخدمة المباشر
-              </span>
-              <h3 className="text-2xl font-bold mb-3 leading-snug">
-                جاهزون لتشريف مناسبتكم القادمة
-              </h3>
-              <p className="text-sand-200/80 text-sm leading-relaxed mb-8">
-                فريقنا المتخصص مستعد لترتيب كافة تفاصيل الضيافة بما يليق بضيوفكم ومقام مناسبتكم.
-              </p>
+          <aside className="space-y-6">
+            <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#1F294A] to-[#151C34] p-6 sm:p-8 text-white border border-[#C2704B]/35 shadow-xl sticky top-28">
+              {/* Subtle decorative glow */}
+              <div
+                className="pointer-events-none absolute -top-16 -right-16 w-44 h-44 rounded-full bg-[#C2704B]/10 blur-2xl"
+                aria-hidden="true"
+              />
 
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-3 text-sm text-sand-100">
-                  <ShieldCheck className="w-5 h-5 text-secondary-400 shrink-0" />
-                  <span>كوادر سعودية مدربة ومؤهلة</span>
+              <div className="relative z-10">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#D69A7E] text-xs font-semibold mb-4 border border-[#C2704B]/30 backdrop-blur-xs">
+                  <Sparkles className="w-3.5 h-3.5 text-[#C2704B]" />
+                  <span>طلب الخدمة المباشر</span>
+                </span>
+
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
+                  جاهزون لتشريف مناسبتكم القادمة
+                </h3>
+
+                <p className="text-[#F8F6F3]/80 text-sm leading-relaxed mb-6 sm:mb-8 font-normal">
+                  فريقنا المتخصص مستعد لترتيب كافة تفاصيل الضيافة بما يليق بضيوفكم ومقام مناسبتكم.
+                </p>
+
+                <div className="space-y-3.5 mb-8">
+                  <div className="flex items-center gap-3 text-sm text-[#F8F6F3]">
+                    <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <span className="leading-snug">كوادر سعودية مدربة ومؤهلة</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-[#F8F6F3]">
+                    <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <span className="leading-snug">التزام دقيق بالمواعيد والجاهزية المبكرة</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-[#F8F6F3]">
+                    <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
+                      <Award className="w-4 h-4" />
+                    </div>
+                    <span className="leading-snug">أواني فاخرة ومعدات ضيافة متكاملة</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-sand-100">
-                  <Clock className="w-5 h-5 text-secondary-400 shrink-0" />
-                  <span>التزام دقيق بالمواعيد والجاهزية المبكرة</span>
-                </div>
-                <div className="flex items-center gap-3 text-sm text-sand-100">
-                  <Award className="w-5 h-5 text-secondary-400 shrink-0" />
-                  <span>أواني فاخرة ومعدات ضيافة متكاملة</span>
+
+                <div className="space-y-3">
+                  <RequestModalTrigger
+                    serviceSlug={service.slug}
+                    className={buttonVariants({
+                      variant: "secondary",
+                      size: "lg",
+                      className: "w-full text-base font-bold shadow-md h-12 flex items-center justify-center gap-2",
+                    })}
+                  >
+                    <span>اطلب الخدمة</span>
+                    <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  </RequestModalTrigger>
+
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="lg"
+                    className="w-full text-base font-bold shadow-md h-12"
+                  >
+                    <a
+                      href={whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 px-3 min-w-0"
+                      title={service.title}
+                    >
+                      <span className="truncate">{service.title}</span>
+                      <SocialIcon platform="whatsapp" className="w-5 h-5 shrink-0 text-white" />
+                    </a>
+                  </Button>
                 </div>
               </div>
-
-              <RequestModalTrigger serviceSlug={service.slug} className={buttonVariants({ variant: "secondary", size: "lg", className: "w-full text-base font-bold mb-3" })}>اطلب الخدمة</RequestModalTrigger>
-              <Button
-                asChild
-                variant="secondary"
-                size="lg"
-                className="w-full text-base font-bold shadow-lg shadow-secondary-900/40"
-              >
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2"
-                >
-                  <PhoneCall className="w-5 h-5" />
-                  <span>واتساب: {service.title}</span>
-                </a>
-              </Button>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
     </div>

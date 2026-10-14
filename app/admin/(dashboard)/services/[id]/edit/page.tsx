@@ -16,7 +16,10 @@ interface EditServicePageProps {
 
 export default async function EditServicePage({ params }: EditServicePageProps) {
   const { id } = await params;
-  const service = await getServiceByIdForAdmin(id);
+  const [service, categories] = await Promise.all([
+    getServiceByIdForAdmin(id),
+    import("@/lib/services/service-dal").then((m) => m.getActiveServiceCategories()),
+  ]);
 
   if (!service) {
     notFound();
@@ -63,6 +66,7 @@ export default async function EditServicePage({ params }: EditServicePageProps) 
       {/* Form Card */}
       <ServiceForm
         initialData={service}
+        categories={categories}
         formAction={boundUpdateAction}
         mode="edit"
       />

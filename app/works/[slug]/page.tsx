@@ -40,9 +40,13 @@ export async function generateMetadata({
   return {
     title: `${item.title} | أعمال مسامر`,
     description: item.shortDescription,
+    alternates: {
+      canonical: `https://masamersa.com/works/${item.slug}`,
+    },
     openGraph: {
       title: `${item.title} | أعمال مسامر`,
       description: item.shortDescription,
+      url: `https://masamersa.com/works/${item.slug}`,
       images: [
         {
           url: item.coverImagePath,

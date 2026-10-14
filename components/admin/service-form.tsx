@@ -22,6 +22,7 @@ import { isRuntimeUploadPath } from "@/lib/utils";
 
 interface ServiceFormProps {
   initialData?: ServiceItem | null;
+  categories?: Array<{ id: string; name: string }>;
   formAction: (
     prevState: ServiceFormState | null,
     formData: FormData
@@ -44,7 +45,7 @@ const ICON_LABELS: Record<string, string> = {
   HeartHandshake: "عناية ولباقة بالضيوف (HeartHandshake)",
 };
 
-export function ServiceForm({ initialData, formAction, mode }: ServiceFormProps) {
+export function ServiceForm({ initialData, categories = [], formAction, mode }: ServiceFormProps) {
   const [state, action, isPending] = useActionState(formAction, null);
 
   const [selectedIcon, setSelectedIcon] = useState<string>(
@@ -161,6 +162,35 @@ export function ServiceForm({ initialData, formAction, mode }: ServiceFormProps)
               </p>
             )}
           </div>
+        </div>
+
+        {/* Service Category */}
+        <div>
+          <label
+            htmlFor="categoryId"
+            className="block text-sm font-semibold text-slate-800 mb-2"
+          >
+            تصنيف الخدمة <span className="text-xs font-normal text-slate-400">(اختياري - يحدد الفئة الرئيسية للخدمة)</span>
+          </label>
+          <select
+            id="categoryId"
+            name="categoryId"
+            defaultValue={initialData?.categoryId || ""}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
+          >
+            <option value="">بدون تصنيف (خدمة عامة)</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1 text-[11px] text-slate-500">
+            يمكنك إضافة أو تعديل الفئات من صفحة{" "}
+            <Link href="/admin/services/categories" target="_blank" className="text-secondary-600 underline font-semibold">
+              تصنيفات الخدمات
+            </Link>.
+          </p>
         </div>
 
         {/* Short Description */}

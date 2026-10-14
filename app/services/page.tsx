@@ -9,9 +9,18 @@ import { RequestModalTrigger } from "@/components/request/request-modal-provider
 import { isRuntimeUploadPath } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "خدمات الضيافة الفاخرة | مسامر",
+  title: "خدمات الضيافة والمناسبات | مسامر",
   description:
-    "استكشف خدمات مسامر المتخصصة في تقديم القهوة السعودية الأصيلة، القهوجيين والصبابين المحترفين، وإدارة بوفيهات المناسبات الملكية والخاصة.",
+    "استكشف خدمات مسامر المتكاملة للمناسبات: خدمات الضيافة البشرية والقهوجيين، الخيام وبيوت الشعر، الأثاث والجلسات، وتنسيق الديكورات في الرياض وجدة والدمام.",
+  alternates: {
+    canonical: "https://masamersa.com/services",
+  },
+  openGraph: {
+    title: "خدمات الضيافة والمناسبات | مسامر",
+    description:
+      "حلول متكاملة للمناسبات والضيافة في الرياض وجدة والدمام: خدمات الضيافة البشرية، الخيام وبيوت الشعر، الأثاث والجلسات، وديكورات وتنسيق المناسبات.",
+    url: "https://masamersa.com/services",
+  },
 };
 
 export const revalidate = 60; // ISR cache revalidation

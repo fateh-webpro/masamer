@@ -27,8 +27,27 @@ export const serviceSchema = z.object({
   features: z
     .array(z.string().min(1))
     .min(1, "يجب إضافة ميزة واحدة على الأقل"),
+  categoryId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   sortOrder: z.coerce.number().int().default(0),
 });
 
 export type ServiceInput = z.infer<typeof serviceSchema>;
+
+export const serviceCategorySchema = z.object({
+  name: z.string().min(2, "اسم التصنيف مطلوب").max(120, "اسم التصنيف طويل جداً"),
+  slug: z
+    .string()
+    .min(2, "الاسم اللطيف (Slug) مطلوب")
+    .max(120, "الاسم اللطيف طويل جداً")
+    .regex(
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "الاسم اللطيف يجب أن يحتوي فقط على أحرف إنجليزية صغيرة وأرقام وشرطات (-)"
+    ),
+  description: z.string().max(300, "الوصف يجب ألا يتجاوز 300 حرف").optional().nullable(),
+  icon: z.string().default("Coffee"),
+  isActive: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().default(0),
+});
+
+export type ServiceCategoryInput = z.infer<typeof serviceCategorySchema>;

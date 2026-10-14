@@ -7,35 +7,79 @@ import { WhyMasamer } from "@/components/home/why-masamer";
 import { CTA } from "@/components/home/cta";
 import { Footer } from "@/components/layout/footer";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
-import { getActiveServices } from "@/lib/services/service-dal";
+import { getActiveServices, getActiveServiceCategories } from "@/lib/services/service-dal";
 import { getFeaturedPortfolioItems } from "@/lib/services/portfolio-dal";
 import { RequestModalProvider } from "@/components/request/request-modal-provider";
+import { siteConfig } from "@/config/site";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [settings, services, featuredWorks] = await Promise.all([
+  const [settings, services, featuredWorks, categories] = await Promise.all([
     getSiteSettings(),
     getActiveServices(),
     getFeaturedPortfolioItems(6),
+    getActiveServiceCategories(),
   ]);
 
   const featuredCover = featuredWorks.length > 0 ? featuredWorks[0].coverImagePath : null;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: settings.siteName || "مسامر",
+    alternateName: "مسامر - حلول متكاملة للمناسبات والضيافة",
+    description:
+      settings.seoDescription || settings.shortDescription || siteConfig.description,
+    url: "https://masamersa.com",
+    telephone: settings.phone,
+    email: settings.email || siteConfig.contact.email,
+    areaServed: [
+      { "@type": "City", name: "الرياض" },
+      { "@type": "City", name: "جدة" },
+      { "@type": "City", name: "الدمام" },
+    ],
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "SA",
+      addressRegion: "المملكة العربية السعودية",
+    },
+    sameAs: [
+      settings.xUrl,
+      settings.instagramUrl,
+      settings.snapchatUrl,
+      settings.tiktokUrl,
+    ].filter((url): url is string => Boolean(url && url.trim())),
+  };
+
   return (
-    <RequestModalProvider services={services.map(({ id, title, slug }) => ({ id, title, slug }))} whatsapp={settings.whatsapp || settings.phone}>
-    <div className="flex min-h-screen flex-col bg-(--background)">
-      <Header settings={settings} />
-      <main className="flex-1">
-        <Hero settings={settings} featuredImage={featuredCover} />
-        <Intro />
-        <ServicesSection services={services} />
-        <WorksSection featuredItems={featuredWorks} />
-        <WhyMasamer settings={settings} />
-        <CTA settings={settings} />
-      </main>
-      <Footer settings={settings} />
-    </div>
+    <RequestModalProvider
+      services={services.map(({ id, title, slug, categoryId, category }) => ({
+        id,
+        title,
+        slug,
+        categoryId,
+        categoryName: category?.name,
+      }))}
+      categories={categories.map(({ id, name }) => ({ id, name }))}
+      whatsapp={settings.whatsapp || settings.phone}
+    >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="flex min-h-screen flex-col bg-(--background)">
+        <Header settings={settings} />
+        <main className="flex-1">
+          <Hero settings={settings} featuredImage={featuredCover} />
+          <Intro />
+          <ServicesSection services={services} />
+          <WorksSection featuredItems={featuredWorks} />
+          <WhyMasamer settings={settings} />
+          <CTA settings={settings} />
+        </main>
+        <Footer settings={settings} />
+      </div>
     </RequestModalProvider>
   );
 }

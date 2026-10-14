@@ -34,11 +34,13 @@ export function Footer({ settings }: FooterProps) {
   );
 
   const socialLinks: { title: string; href?: string | null; platform: SocialPlatform }[] = [
-    { title: "فيسبوك", href: settings?.facebookUrl, platform: "facebook" },
-    { title: "تويتر", href: settings?.xUrl, platform: "twitter" },
+    { title: "إكس (تويتر)", href: settings?.xUrl, platform: "twitter" },
     { title: "إنستغرام", href: settings?.instagramUrl, platform: "instagram" },
     { title: "سناب شات", href: settings?.snapchatUrl, platform: "snapchat" },
+    { title: "تيك توك", href: settings?.tiktokUrl, platform: "tiktok" },
   ];
+
+  const activeSocialLinks = socialLinks.filter((social) => Boolean(social.href && social.href.trim()));
 
   return (
     <footer className="bg-(--primary-dark) text-white border-t border-white/10">
@@ -69,28 +71,22 @@ export function Footer({ settings }: FooterProps) {
               </p>
 
               {/* Social Links */}
-              <div className="mt-6 flex flex-wrap items-center gap-3" aria-label="روابط الشبكات الاجتماعية">
-                {socialLinks.map((social) => social.href ? (
-                  <a
-                    key={social.title}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 transition-[color,background-color,border-color] duration-250 hover:border-[#C2704B]/50 hover:bg-white/10 hover:text-[#C2704B] active:text-[#C2704B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2704B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#151C34] focus-visible:text-[#C2704B]"
-                    aria-label={social.title}
-                  >
-                    <SocialIcon platform={social.platform} className="h-5 w-5 transition-[color,transform] duration-250 group-hover:scale-110 group-hover:text-[#C2704B] group-active:scale-[0.97] group-active:text-[#C2704B] group-focus-visible:scale-110 group-focus-visible:text-[#C2704B] motion-reduce:transform-none motion-reduce:transition-none" />
-                  </a>
-                ) : (
-                  <span
-                    key={social.title}
-                    className="group flex h-11 w-11 cursor-default items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/40 transition-[color,background-color,border-color] duration-250 hover:border-[#C2704B]/40 hover:bg-white/10 hover:text-[#C2704B]"
-                    aria-label={`${social.title} — الرابط غير متوفر`}
-                  >
-                    <SocialIcon platform={social.platform} className="h-5 w-5 transition-[color,transform] duration-250 group-hover:scale-110 group-hover:text-[#C2704B] motion-reduce:transform-none motion-reduce:transition-none" />
-                  </span>
-                ))}
-              </div>
+              {activeSocialLinks.length > 0 && (
+                <div className="mt-6 flex flex-wrap items-center gap-3" aria-label="روابط الشبكات الاجتماعية">
+                  {activeSocialLinks.map((social) => (
+                    <a
+                      key={social.title}
+                      href={social.href!}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 transition-[color,background-color,border-color] duration-250 hover:border-[#C2704B]/50 hover:bg-white/10 hover:text-[#C2704B] active:text-[#C2704B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C2704B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#151C34] focus-visible:text-[#C2704B]"
+                      aria-label={social.title}
+                    >
+                      <SocialIcon platform={social.platform} className="h-5 w-5 transition-[color,transform] duration-250 group-hover:scale-110 group-hover:text-[#C2704B] group-active:scale-[0.97] group-active:text-[#C2704B] group-focus-visible:scale-110 group-focus-visible:text-[#C2704B] motion-reduce:transform-none motion-reduce:transition-none" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 

@@ -1,7 +1,21 @@
 import { prisma } from "../prisma";
 
+export interface ServiceCategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+  _count?: { services: number };
+}
+
 export interface ServiceItem {
   id: string;
+  categoryId?: string | null;
   slug: string;
   title: string;
   shortDescription: string;
@@ -13,6 +27,7 @@ export interface ServiceItem {
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
+  category?: { id: string; name: string; slug: string } | null;
   images: Array<{ id: string; serviceId: string; imagePath: string; altText: string | null; sortOrder: number; createdAt: Date }>;
 }
 
@@ -47,7 +62,10 @@ export async function getActiveServices(): Promise<ServiceItem[]> {
     const services = await prisma.service.findMany({
       where: { isActive: true },
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-      include: { images: { orderBy: { sortOrder: "asc" } } },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
 
     return services.map((s) => ({
@@ -66,7 +84,10 @@ export async function getServiceBySlug(
   try {
     const service = await prisma.service.findFirst({
       where: { slug, isActive: true },
-      include: { images: { orderBy: { sortOrder: "asc" } } },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
 
     if (!service) return null;
@@ -82,29 +103,110 @@ export async function getServiceBySlug(
 }
 
 export async function getAllServicesForAdmin(): Promise<ServiceItem[]> {
-  const services = await prisma.service.findMany({
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
-    include: { images: { orderBy: { sortOrder: "asc" } } },
-  });
+  try {
+    const services = await prisma.service.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
+    });
 
-  return services.map((s) => ({
-    ...s,
-    features: parseFeatures(s.features),
-  }));
+    return services.map((s) => ({
+      ...s,
+      features: parseFeatures(s.features),
+    }));
+  } catch (error) {
+    console.error("Error fetching admin services:", error);
+    return [];
+  }
 }
 
 export async function getServiceByIdForAdmin(
   id: string
 ): Promise<ServiceItem | null> {
-  const service = await prisma.service.findUnique({
-    where: { id },
-    include: { images: { orderBy: { sortOrder: "asc" } } },
-  });
+  try {
+    const service = await prisma.service.findUnique({
+      where: { id },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
+    });
 
-  if (!service) return null;
+    if (!service) return null;
 
-  return {
-    ...service,
-    features: parseFeatures(service.features),
-  };
+    return {
+      ...service,
+      features: parseFeatures(service.features),
+    };
+  } catch (error) {
+    console.error(`Error fetching service by id "${id}":`, error);
+    return null;
+  }
+}
+
+export async function getActiveServiceCategories(): Promise<ServiceCategoryItem[]> {
+  try {
+    return await prisma.serviceCategory.findMany({
+      where: { isActive: true },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      include: {
+        _count: {
+          select: { services: true },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching active service categories:", error);
+    return [];
+  }
+}
+
+export async function getAllServiceCategoriesForAdmin(): Promise<ServiceCategoryItem[]> {
+  try {
+    return await prisma.serviceCategory.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+      include: {
+        _count: {
+          select: { services: true },
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching admin service categories:", error);
+    return [];
+  }
+}
+
+export async function getServiceCategoryByIdForAdmin(id: string): Promise<ServiceCategoryItem | null> {
+  try {
+    return await prisma.serviceCategory.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { services: true },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(`Error fetching service category by id "${id}":`, error);
+    return null;
+  }
+}
+
+export async function getServiceCategoryBySlug(slug: string): Promise<ServiceCategoryItem | null> {
+  try {
+    return await prisma.serviceCategory.findFirst({
+      where: { slug, isActive: true },
+      include: {
+        _count: {
+          select: { services: true },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(`Error fetching service category by slug "${slug}":`, error);
+    return null;
+  }
 }

@@ -1,12 +1,15 @@
 import React from "react";
 import Link from "next/link";
 import { PlusCircle, ChevronLeft } from "lucide-react";
+import { getActiveServiceCategories } from "@/lib/services/service-dal";
 import { ServiceForm } from "@/components/admin/service-form";
 import { createServiceAction } from "@/app/admin/services/actions";
 
 export const dynamic = "force-dynamic";
 
-export default function NewServicePage() {
+export default async function NewServicePage() {
+  const categories = await getActiveServiceCategories();
+
   return (
     <div className="space-y-6">
       {/* Breadcrumbs & Header */}
@@ -42,7 +45,7 @@ export default function NewServicePage() {
       </div>
 
       {/* Form Card */}
-      <ServiceForm formAction={createServiceAction} mode="create" />
+      <ServiceForm categories={categories} formAction={createServiceAction} mode="create" />
     </div>
   );
 }

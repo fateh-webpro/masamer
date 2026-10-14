@@ -15,7 +15,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   const title = settings.seoTitle || settings.siteName || siteConfig.title;
-  const description = settings.seoDescription || settings.shortDescription || siteConfig.description;
+  const description =
+    settings.seoDescription || settings.shortDescription || siteConfig.description;
   const favicon = settings.faviconPath || "/favicon.ico";
   const ogImage = settings.seoImagePath || "/og-image.jpg";
 
@@ -26,6 +27,22 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.siteName || siteConfig.name}`,
     },
     description,
+    keywords: [
+      "مسامر",
+      "حلول متكاملة للمناسبات والضيافة",
+      "خدمات الضيافة البشرية",
+      "قهوجيين وصبابين",
+      "الخيام وبيوت الشعر",
+      "الأثاث والجلسات",
+      "ديكورات وتنسيق المناسبات",
+      "تجهيز مناسبات الرياض",
+      "تجهيز مناسبات جدة",
+      "تجهيز مناسبات الدمام",
+      "كل احتياجات مناسبتك في مكان واحد",
+    ],
+    alternates: {
+      canonical: "https://masamersa.com",
+    },
     icons: {
       icon: favicon,
       apple: favicon,

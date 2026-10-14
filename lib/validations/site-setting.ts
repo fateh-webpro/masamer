@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const SITE_SETTING_TEXT_FIELDS = [
   "siteName", "siteNameEn", "shortDescription", "phone", "whatsapp", "email", "address",
-  "facebookUrl", "xUrl", "instagramUrl", "snapchatUrl", "heroBadge", "heroTitle",
+  "xUrl", "instagramUrl", "snapchatUrl", "tiktokUrl", "heroBadge", "heroTitle",
   "heroHighlightedText", "heroDescription", "heroPrimaryButtonText", "heroSecondaryButtonText",
   "footerDescription", "copyrightText", "seoTitle", "seoDescription",
 ] as const;
@@ -47,10 +47,10 @@ export const siteSettingSchema = z.object({
   whatsapp: optionalText(50, "رقم الواتساب طويل جداً"),
   email: optionalEmail,
   address: optionalText(255, "العنوان طويل جداً"),
-  facebookUrl: optionalSocialUrl("رابط فيسبوك غير صالح", ["facebook.com"]),
   xUrl: optionalSocialUrl("رابط تويتر غير صالح", ["twitter.com", "x.com"]),
   instagramUrl: optionalSocialUrl("رابط إنستغرام غير صالح", ["instagram.com"]),
   snapchatUrl: optionalSocialUrl("رابط سناب شات غير صالح", ["snapchat.com"]),
+  tiktokUrl: optionalSocialUrl("رابط تيك توك غير صالح", ["tiktok.com"]),
   heroBadge: optionalText(150, "نص الشارة طويل جداً"),
   heroTitle: optionalText(200, "عنوان الواجهة طويل جداً"),
   heroHighlightedText: optionalText(200, "النص المميز طويل جداً"),

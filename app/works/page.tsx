@@ -18,10 +18,14 @@ export async function generateMetadata(): Promise<Metadata> {
     title: `معرض الأعمال والتجهيزات | ${siteName}`,
     description:
       "استكشف معرض أعمال مسامر الحقيقية في تجهيز الفعاليات الكبرى والمناسبات الملكية والخاصة، وخدمات القهوجيين والصبابين والتأثيث الفاخر في المملكة العربية السعودية.",
+    alternates: {
+      canonical: "https://masamersa.com/works",
+    },
     openGraph: {
       title: `معرض الأعمال والتجهيزات | ${siteName}`,
       description:
         "شاهد نماذج من تجهيزاتنا الميدانية الفاخرة للفعاليات والمناسبات الملكية والخاصة في المملكة العربية السعودية.",
+      url: "https://masamersa.com/works",
     },
   };
 }

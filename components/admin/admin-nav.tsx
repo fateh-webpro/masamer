@@ -40,6 +40,12 @@ export function AdminNav({ adminName, adminEmail }: AdminNavProps) {
       title: "إدارة الخدمات",
       href: "/admin/services",
       icon: Layers,
+      exact: true,
+    },
+    {
+      title: "تصنيفات الخدمات",
+      href: "/admin/services/categories",
+      icon: FolderTree,
       exact: false,
     },
     { title: "الطلبات", href: "/admin/requests", icon: ClipboardList, exact: false },

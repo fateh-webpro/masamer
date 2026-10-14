@@ -36,12 +36,20 @@ export default async function AdminServicesPage() {
           </p>
         </div>
 
-        <Button asChild variant="secondary" size="lg" className="gap-2 font-bold shadow-md shadow-secondary-900/10">
-          <Link href="/admin/services/new">
-            <PlusCircle className="w-4 h-4" />
-            <span>إضافة خدمة جديدة</span>
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button asChild variant="outline" size="lg" className="gap-2 font-semibold border-slate-200">
+            <Link href="/admin/services/categories">
+              <Layers className="w-4 h-4 text-secondary-600" />
+              <span>تصنيفات الخدمات</span>
+            </Link>
+          </Button>
+          <Button asChild variant="secondary" size="lg" className="gap-2 font-bold shadow-md shadow-secondary-900/10">
+            <Link href="/admin/services/new">
+              <PlusCircle className="w-4 h-4" />
+              <span>إضافة خدمة جديدة</span>
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Services Table Card */}
@@ -68,6 +76,7 @@ export default async function AdminServicesPage() {
               <thead className="bg-slate-50 text-slate-700 text-xs font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-4 px-6">الخدمة</th>
+                  <th className="py-4 px-6">التصنيف</th>
                   <th className="py-4 px-6">الاسم اللطيف (Slug)</th>
                   <th className="py-4 px-6">الحالة</th>
                   <th className="py-4 px-6">الترتيب</th>
@@ -102,6 +111,15 @@ export default async function AdminServicesPage() {
                           </p>
                         </div>
                       </div>
+                    </td>
+                    <td className="py-4 px-6 text-xs font-semibold text-slate-700">
+                      {service.category?.name ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-sand-100 text-secondary-800 border border-sand-200">
+                          {service.category.name}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">عامة</span>
+                      )}
                     </td>
                     <td className="py-4 px-6 font-mono text-xs text-slate-600" dir="ltr">
                       {service.slug}

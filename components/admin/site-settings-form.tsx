@@ -508,26 +508,8 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="facebookUrl" className="block text-sm font-semibold text-slate-800 mb-2">
-                رابط فيسبوك
-              </label>
-              <input
-                type="url"
-                id="facebookUrl"
-                name="facebookUrl"
-                dir="ltr"
-                defaultValue={initialData.facebookUrl || ""}
-                placeholder="https://facebook.com/masamer"
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm text-left focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
-              />
-              {state?.fieldErrors?.facebookUrl && (
-                <p className="mt-1 text-xs text-rose-600">{state.fieldErrors.facebookUrl[0]}</p>
-              )}
-            </div>
-
-            <div>
               <label htmlFor="xUrl" className="block text-sm font-semibold text-slate-800 mb-2">
-                رابط تويتر
+                رابط إكس (تويتر)
               </label>
               <input
                 type="url"
@@ -535,7 +517,7 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
                 name="xUrl"
                 dir="ltr"
                 defaultValue={initialData.xUrl || ""}
-                placeholder="https://twitter.com/masamer أو https://x.com/masamer"
+                placeholder="https://x.com/masamer"
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm text-left focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
               />
               {state?.fieldErrors?.xUrl && (
@@ -576,6 +558,24 @@ export function SiteSettingsForm({ initialData }: SiteSettingsFormProps) {
               />
               {state?.fieldErrors?.snapchatUrl && (
                 <p className="mt-1 text-xs text-rose-600">{state.fieldErrors.snapchatUrl[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="tiktokUrl" className="block text-sm font-semibold text-slate-800 mb-2">
+                رابط تيك توك (TikTok)
+              </label>
+              <input
+                type="url"
+                id="tiktokUrl"
+                name="tiktokUrl"
+                dir="ltr"
+                defaultValue={initialData.tiktokUrl || ""}
+                placeholder="https://tiktok.com/@masamer"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm text-left focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
+              />
+              {state?.fieldErrors?.tiktokUrl && (
+                <p className="mt-1 text-xs text-rose-600">{state.fieldErrors.tiktokUrl[0]}</p>
               )}
             </div>
           </div>

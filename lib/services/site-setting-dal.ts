@@ -27,6 +27,7 @@ export interface SiteSettingsData {
   xUrl: string | null;
   instagramUrl: string | null;
   snapchatUrl: string | null;
+  tiktokUrl: string | null;
   heroBadge: string;
   heroTitle: string;
   heroHighlightedText: string;
@@ -64,6 +65,7 @@ const DEFAULT_SETTINGS: SiteSettingsData = {
   xUrl: null,
   instagramUrl: null,
   snapchatUrl: null,
+  tiktokUrl: null,
   heroBadge: siteConfig.hero?.badge || "أصالة الضيافة برؤية معاصرة",
   heroTitle: siteConfig.hero?.titlePrimary || "مسـامر لخدمات الضيافة",
   heroHighlightedText: siteConfig.hero?.titleHighlight || "فخامة تليق بضيوفك ومناسباتك",
@@ -114,6 +116,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsData> => {
       xUrl: record.xUrl,
       instagramUrl: record.instagramUrl,
       snapchatUrl: record.snapchatUrl,
+      tiktokUrl: record.tiktokUrl ?? null,
       heroBadge: record.heroBadge || DEFAULT_SETTINGS.heroBadge,
       heroTitle: record.heroTitle || DEFAULT_SETTINGS.heroTitle,
       heroHighlightedText: record.heroHighlightedText || DEFAULT_SETTINGS.heroHighlightedText,
