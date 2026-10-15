@@ -6,12 +6,21 @@ import { X } from "lucide-react";
 import { RequestForm } from "@/components/request/request-form";
 import { cn } from "@/lib/utils";
 
+export type RequestSubOption = {
+  id: string;
+  name: string;
+  description?: string | null;
+  sortOrder?: number;
+};
+
 export type RequestServiceOption = {
   id: string;
   title: string;
   slug: string;
+  icon?: string;
   categoryId?: string | null;
   categoryName?: string | null;
+  options?: RequestSubOption[];
 };
 
 export type RequestCategoryOption = {
@@ -133,6 +142,7 @@ export function RequestModalProvider({
                   key={serviceSlug ?? "general"}
                   services={services}
                   categories={categories}
+                  initialServiceSlug={serviceSlug}
                   selectedServiceId={selectedServiceId}
                   whatsapp={whatsapp}
                 />

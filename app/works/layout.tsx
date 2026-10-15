@@ -18,12 +18,19 @@ export default async function WorksLayout({
 
   return (
     <RequestModalProvider
-      services={services.map(({ id, title, slug, categoryId, category }) => ({
+      services={services.map(({ id, title, slug, icon, categoryId, category, options }) => ({
         id,
         title,
         slug,
+        icon,
         categoryId,
         categoryName: category?.name,
+        options: options?.map((o) => ({
+          id: o.id,
+          name: o.name,
+          description: o.description,
+          sortOrder: o.sortOrder,
+        })),
       }))}
       categories={categories.map(({ id, name }) => ({ id, name }))}
       whatsapp={settings.whatsapp || settings.phone}

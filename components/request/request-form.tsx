@@ -1,31 +1,38 @@
 "use client";
 
-import { useActionState, useState, useMemo, useEffect } from "react";
+import { useActionState, useState, useMemo } from "react";
 import {
   CheckCircle2,
   Loader2,
   MessageCircle,
   Send,
   Plus,
+  Minus,
   Trash2,
   ShoppingBag,
-  Layers,
   Sparkles,
-  MapPin,
   Calendar,
   User,
-  Phone,
-  FileText,
 } from "lucide-react";
 import { createRequestAction } from "@/app/actions/request";
 import { formatWhatsAppUrl } from "@/lib/utils";
+import { ServiceIcon } from "@/components/shared/service-icon";
+
+export type SubOptionType = {
+  id: string;
+  name: string;
+  description?: string | null;
+  sortOrder?: number;
+};
 
 export type ServiceOption = {
   id: string;
   title: string;
   slug: string;
+  icon?: string;
   categoryId?: string | null;
   categoryName?: string | null;
+  options?: SubOptionType[];
 };
 
 export type CategoryOption = {
@@ -35,8 +42,10 @@ export type CategoryOption = {
 
 export interface SelectedServiceItem {
   key: string;
-  serviceId?: string;
+  serviceId: string;
   serviceName: string;
+  optionId?: string;
+  optionName?: string;
   categoryName?: string;
   quantity: number;
 }
@@ -45,79 +54,41 @@ interface RequestFormProps {
   services: ServiceOption[];
   categories?: CategoryOption[];
   selectedServiceId?: string;
+  initialServiceSlug?: string;
   whatsapp: string;
 }
 
-const DEFAULT_CATEGORIES: CategoryOption[] = [
-  { id: "hospitality", name: "خدمات الضيافة البشرية" },
-  { id: "tents", name: "الخيام وبيوت الشعر" },
-  { id: "furniture", name: "الأثاث والجلسات" },
-  { id: "decor", name: "ديكورات وتنسيق المناسبات" },
-];
-
 export function RequestForm({
   services,
-  categories = DEFAULT_CATEGORIES,
   selectedServiceId,
+  initialServiceSlug,
   whatsapp,
 }: RequestFormProps) {
   const [state, action, pending] = useActionState(createRequestAction, null);
 
-  // Available categories list
-  const activeCategories = useMemo(() => {
-    if (categories && categories.length > 0) return categories;
-    return DEFAULT_CATEGORIES;
-  }, [categories]);
-
-  // Find initial service if opened from a specific service page
+  // Find initial service if opened from a specific service page or by ID
   const initialService = useMemo(() => {
-    if (!selectedServiceId) return null;
-    return services.find((s) => s.id === selectedServiceId) || null;
-  }, [selectedServiceId, services]);
-
-  // Selected Category filter in selector
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(() => {
-    if (initialService?.categoryId) return initialService.categoryId;
-    return activeCategories[0]?.id || "";
-  });
-
-  // Services available for currently selected category
-  const filteredServices = useMemo(() => {
-    if (!selectedCategoryId) return services;
-    const matching = services.filter((s) => s.categoryId === selectedCategoryId);
-    // If no services explicitly matched this category, show all so user can always pick
-    return matching.length > 0 ? matching : services;
-  }, [selectedCategoryId, services]);
-
-  // Currently picked sub-service in dropdown
-  const [pickedServiceId, setPickedServiceId] = useState<string>(() => {
-    if (initialService) return initialService.id;
-    return filteredServices[0]?.id || "";
-  });
-
-  // Keep picked service in sync when category changes
-  useEffect(() => {
-    if (filteredServices.length > 0 && !filteredServices.some((s) => s.id === pickedServiceId)) {
-      setPickedServiceId(filteredServices[0].id);
+    if (initialServiceSlug) {
+      return services.find((s) => s.slug === initialServiceSlug) || null;
     }
-  }, [filteredServices, pickedServiceId]);
+    if (selectedServiceId) {
+      return services.find((s) => s.id === selectedServiceId) || null;
+    }
+    return services[0] || null;
+  }, [initialServiceSlug, selectedServiceId, services]);
 
-  // Quantity input for the service being added
-  const [itemQuantity, setItemQuantity] = useState<number>(1);
+  // Selected active main service tab
+  const [activeServiceId, setActiveServiceId] = useState<string>(() => {
+    return initialService?.id || services[0]?.id || "";
+  });
 
-  // Order items state
+  // Current active main service object
+  const currentService = useMemo(() => {
+    return services.find((s) => s.id === activeServiceId) || services[0] || null;
+  }, [services, activeServiceId]);
+
+  // Order items state across all main services
   const [selectedItems, setSelectedItems] = useState<SelectedServiceItem[]>(() => {
-    if (initialService) {
-      return [
-        {
-          key: `${initialService.id}-${Date.now()}`,
-          serviceId: initialService.id,
-          serviceName: initialService.title,
-          categoryName: initialService.categoryName || activeCategories.find((c) => c.id === initialService.categoryId)?.name || undefined,
-          quantity: 1,
-        },
-      ];
-    }
     return [];
   });
 
@@ -137,44 +108,86 @@ export function RequestForm({
     return `${year}-${month}-${day}`;
   }, []);
 
-  // Handler to add chosen service to the order
-  const handleAddService = () => {
-    const serviceToAdd = services.find((s) => s.id === pickedServiceId);
-    if (!serviceToAdd) return;
+  const getItemQuantity = (serviceId: string, optionId?: string) => {
+    const key = `${serviceId}-${optionId || "main"}`;
+    const found = selectedItems.find((i) => i.key === key);
+    return found ? found.quantity : 0;
+  };
 
-    const qty = Math.max(1, Math.floor(itemQuantity || 1));
-    const currentCategory = activeCategories.find((c) => c.id === selectedCategoryId);
-
+  const handleToggleOrAddOption = (service: ServiceOption, option?: SubOptionType) => {
+    const key = `${service.id}-${option?.id || "main"}`;
     setSelectedItems((prev) => {
-      // Check if already in order
-      const existingIdx = prev.findIndex((item) => item.serviceId === serviceToAdd.id);
-      if (existingIdx !== -1) {
-        const updated = [...prev];
-        updated[existingIdx] = {
-          ...updated[existingIdx],
-          quantity: updated[existingIdx].quantity + qty,
-        };
-        return updated;
+      const existing = prev.find((i) => i.key === key);
+      if (existing) {
+        return prev.filter((i) => i.key !== key);
+      }
+      if (prev.length >= 50) {
+        alert("الحد الأقصى لعدد العناصر في الطلب الواحد هو 50 عنصراً");
+        return prev;
       }
       return [
         ...prev,
         {
-          key: `${serviceToAdd.id}-${Date.now()}`,
-          serviceId: serviceToAdd.id,
-          serviceName: serviceToAdd.title,
-          categoryName: serviceToAdd.categoryName || currentCategory?.name || undefined,
-          quantity: qty,
+          key,
+          serviceId: service.id,
+          serviceName: service.title,
+          optionId: option?.id,
+          optionName: option?.name,
+          categoryName: service.categoryName || undefined,
+          quantity: 1,
         },
       ];
     });
-
-    // Reset quantity input to 1
-    setItemQuantity(1);
   };
 
-  // Handler to remove a service item
-  const handleRemoveItem = (keyToRemove: string) => {
-    setSelectedItems((prev) => prev.filter((item) => item.key !== keyToRemove));
+  const handleIncreaseQty = (service: ServiceOption, option?: SubOptionType) => {
+    const key = `${service.id}-${option?.id || "main"}`;
+    setSelectedItems((prev) => {
+      const idx = prev.findIndex((i) => i.key === key);
+      if (idx !== -1) {
+        if (prev[idx].quantity >= 1000) return prev;
+        const next = [...prev];
+        next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 };
+        return next;
+      }
+      if (prev.length >= 50) {
+        alert("الحد الأقصى لعدد العناصر في الطلب الواحد هو 50 عنصراً");
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          key,
+          serviceId: service.id,
+          serviceName: service.title,
+          optionId: option?.id,
+          optionName: option?.name,
+          categoryName: service.categoryName || undefined,
+          quantity: 1,
+        },
+      ];
+    });
+  };
+
+  const handleDecreaseQty = (key: string) => {
+    setSelectedItems((prev) => {
+      const idx = prev.findIndex((i) => i.key === key);
+      if (idx === -1) return prev;
+      if (prev[idx].quantity > 1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], quantity: next[idx].quantity - 1 };
+        return next;
+      }
+      return prev.filter((i) => i.key !== key);
+    });
+  };
+
+  const handleRemoveItem = (key: string) => {
+    setSelectedItems((prev) => prev.filter((i) => i.key !== key));
+  };
+
+  const getSelectedCountForService = (serviceId: string) => {
+    return selectedItems.filter((i) => i.serviceId === serviceId).length;
   };
 
   // Order totals
@@ -224,7 +237,20 @@ export function RequestForm({
   return (
     <form action={action} className="space-y-6 rounded-3xl border border-[#E8E3DE] bg-white p-5 shadow-sm sm:p-7">
       {/* Hidden inputs to pass structured data */}
-      <input type="hidden" name="items" value={JSON.stringify(selectedItems)} />
+      <input
+        type="hidden"
+        name="items"
+        value={JSON.stringify(
+          selectedItems.map((item) => ({
+            serviceId: item.serviceId,
+            optionId: item.optionId,
+            serviceName: item.serviceName,
+            optionName: item.optionName,
+            categoryName: item.categoryName,
+            quantity: item.quantity,
+          }))
+        )}
+      />
       <input type="hidden" name="city" value={citySelect === "أخرى" ? customCity : citySelect} />
       {citySelect === "أخرى" && <input type="hidden" name="customCity" value={customCity} />}
 
@@ -232,7 +258,7 @@ export function RequestForm({
       <div className="border-b border-[#E8E3DE] pb-5">
         <h3 className="text-xl font-bold text-[#1F294A]">طلب خدمات وتجهيز المناسبات</h3>
         <p className="mt-1.5 text-sm leading-6 text-[#747986]">
-          حدد الخدمات المطلوبة والكميات وسيقوم فريق مسامر بالتنسيق المباشر معك.
+          حدد الخدمات الرئيسية وخياراتها والكميات المطلوبة، وسيقوم فريق مسامر بالتنسيق المباشر معك.
         </p>
       </div>
 
@@ -242,120 +268,243 @@ export function RequestForm({
         </div>
       )}
 
-      {/* SECTION 1: Service Categories & Items Selection */}
+      {/* SECTION 1: Service Categories & Options Selection */}
       <div className="space-y-4 rounded-2xl bg-sand-50/60 p-4 sm:p-5 border border-sand-200/70">
         <div className="flex items-center gap-2">
           <ShoppingBag className="w-5 h-5 text-secondary-600" />
-          <h4 className="font-bold text-[#1F294A] text-base">اختيار الخدمات والكميات</h4>
+          <h4 className="font-bold text-[#1F294A] text-base">اختيار الخدمات والخيارات والكميات</h4>
         </div>
 
-        {/* Categories & Services Grid */}
-        <div className="grid gap-4 sm:grid-cols-12">
-          {/* Main Category */}
-          <div className="sm:col-span-5">
-            <label htmlFor="request-category" className="mb-1.5 block text-xs font-semibold text-[#1F294A]">
-              الفئة الرئيسية
-            </label>
-            <select
-              id="request-category"
-              value={selectedCategoryId}
-              onChange={(e) => setSelectedCategoryId(e.target.value)}
-              className={field}
-            >
-              {activeCategories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sub Service */}
-          <div className="sm:col-span-5">
-            <label htmlFor="request-subservice" className="mb-1.5 block text-xs font-semibold text-[#1F294A]">
-              الخدمة الفرعية
-            </label>
-            <select
-              id="request-subservice"
-              value={pickedServiceId}
-              onChange={(e) => setPickedServiceId(e.target.value)}
-              className={field}
-            >
-              {filteredServices.length === 0 ? (
-                <option value="" disabled>لا توجد خدمات متاحة</option>
-              ) : (
-                filteredServices.map((service) => (
-                  <option key={service.id} value={service.id}>
-                    {service.title}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-
-          {/* Quantity */}
-          <div className="sm:col-span-2">
-            <label htmlFor="request-quantity" className="mb-1.5 block text-xs font-semibold text-[#1F294A]">
-              الكمية
-            </label>
-            <input
-              id="request-quantity"
-              type="number"
-              min={1}
-              value={itemQuantity}
-              onChange={(e) => setItemQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
-              className={`${field} text-center font-bold`}
-            />
+        {/* Main Services Navigation Tabs */}
+        <div>
+          <label className="mb-2 block text-xs font-semibold text-[#1F294A]">
+            اختر الخدمة الرئيسية لتصفح خياراتها وتحديد الكمية:
+          </label>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {services.map((svc) => {
+              const isActive = svc.id === activeServiceId;
+              const count = getSelectedCountForService(svc.id);
+              return (
+                <button
+                  key={svc.id}
+                  type="button"
+                  onClick={() => setActiveServiceId(svc.id)}
+                  className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition-all ${
+                    isActive
+                      ? "border-secondary-600 bg-white shadow-sm ring-2 ring-secondary-500/20 text-secondary-900"
+                      : "border-sand-200/90 bg-white/70 hover:bg-white text-slate-700 hover:border-sand-300"
+                  }`}
+                >
+                  {count > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1.5 rounded-full bg-secondary-700 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                      {count}
+                    </span>
+                  )}
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1.5 ${
+                      isActive ? "bg-sand-100 text-secondary-700" : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    <ServiceIcon name={svc.icon || "Coffee"} className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-bold leading-tight line-clamp-2">
+                    {svc.title}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Add Service Button */}
-        <div className="flex justify-end pt-1">
-          <button
-            type="button"
-            onClick={handleAddService}
-            disabled={!pickedServiceId}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-primary-900 hover:bg-primary-950 text-white px-4 py-2.5 text-xs font-bold transition-colors disabled:opacity-50"
-          >
-            <Plus className="w-4 h-4" />
-            <span>إضافة الخدمة إلى الطلب</span>
-          </button>
-        </div>
+        {/* Active Service Sub-Options */}
+        {currentService && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <span>خيارات</span>
+                <span className="text-secondary-700">({currentService.title})</span>:
+              </h5>
+              <span className="text-[11px] text-slate-500">
+                حدد الخيارات واضبط الكمية بـ (+) و (-)
+              </span>
+            </div>
+
+            {currentService.options && currentService.options.length > 0 ? (
+              <div className="grid gap-2.5 sm:grid-cols-2">
+                {currentService.options.map((opt) => {
+                  const qty = getItemQuantity(currentService.id, opt.id);
+                  const isSelected = qty > 0;
+                  const key = `${currentService.id}-${opt.id}`;
+
+                  return (
+                    <div
+                      key={opt.id}
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                        isSelected
+                          ? "border-secondary-500 bg-white shadow-2xs ring-1 ring-secondary-400/20"
+                          : "border-sand-200 bg-white/80 hover:bg-white hover:border-sand-300"
+                      }`}
+                    >
+                      <div className="min-w-0 pr-1">
+                        <p className={`text-xs font-bold ${isSelected ? "text-secondary-900" : "text-slate-800"}`}>
+                          {opt.name}
+                        </p>
+                        {opt.description && (
+                          <p className="text-[11px] text-slate-500 line-clamp-1 mt-0.5">
+                            {opt.description}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="shrink-0 mr-3">
+                        {isSelected ? (
+                          <div className="inline-flex items-center gap-1 bg-sand-100 rounded-lg p-1 border border-sand-200">
+                            <button
+                              type="button"
+                              onClick={() => handleDecreaseQty(key)}
+                              className="w-6 h-6 rounded bg-white hover:bg-rose-50 hover:text-rose-600 text-slate-700 flex items-center justify-center font-bold text-xs transition-colors shadow-2xs"
+                              aria-label={`تقليل كمية ${opt.name}`}
+                            >
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="min-w-7 text-center font-bold text-xs text-secondary-900">
+                              {qty}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleIncreaseQty(currentService, opt)}
+                              className="w-6 h-6 rounded bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 flex items-center justify-center font-bold text-xs transition-colors shadow-2xs"
+                              aria-label={`زيادة كمية ${opt.name}`}
+                            >
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleToggleOrAddOption(currentService, opt)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-sand-300 bg-sand-50 hover:bg-secondary-600 hover:text-white hover:border-secondary-600 text-secondary-800 text-xs font-bold transition-all shadow-2xs"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>اختيار</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              /* Fallback if no sub-options in DB yet */
+              <div className="p-4 rounded-xl border border-sand-200 bg-white flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-900">{currentService.title}</p>
+                  <p className="text-[11px] text-slate-500">طلب الخدمة الرئيسية مباشرة</p>
+                </div>
+                {(() => {
+                  const qty = getItemQuantity(currentService.id);
+                  const isSelected = qty > 0;
+                  const key = `${currentService.id}-main`;
+                  return isSelected ? (
+                    <div className="inline-flex items-center gap-1 bg-sand-100 rounded-lg p-1 border border-sand-200">
+                      <button
+                        type="button"
+                        onClick={() => handleDecreaseQty(key)}
+                        className="w-6 h-6 rounded bg-white hover:bg-rose-50 hover:text-rose-600 text-slate-700 flex items-center justify-center font-bold text-xs"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="min-w-7 text-center font-bold text-xs text-secondary-900">{qty}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleIncreaseQty(currentService)}
+                        className="w-6 h-6 rounded bg-white hover:bg-emerald-50 hover:text-emerald-700 text-slate-700 flex items-center justify-center font-bold text-xs"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleOrAddOption(currentService)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-sand-300 bg-sand-50 hover:bg-secondary-600 hover:text-white hover:border-secondary-600 text-secondary-800 text-xs font-bold"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>اختيار</span>
+                    </button>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Selected Services Summary Box */}
         {selectedItems.length > 0 && (
           <div className="space-y-2.5 pt-3 border-t border-sand-200/80">
             <div className="flex items-center justify-between text-xs font-semibold text-[#1F294A]">
-              <span>الخدمات المختارة في هذا الطلب:</span>
-              <span className="text-secondary-700 bg-sand-100 px-2.5 py-0.5 rounded-full border border-sand-200">
-                {totalItemsCount} خدمات | إجمالي الكميات: {totalQuantitySum}
+              <span>الخيارات المختارة في هذا الطلب:</span>
+              <span className="text-secondary-700 bg-sand-100 px-2.5 py-0.5 rounded-full border border-sand-200 font-bold">
+                {totalItemsCount} عناصر • إجمالي الكميات: {totalQuantitySum}
               </span>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-56 overflow-y-auto pr-0.5">
               {selectedItems.map((item) => (
                 <div
                   key={item.key}
                   className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white border border-[#E8E3DE] shadow-2xs"
                 >
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-[#1F294A] truncate">{item.serviceName}</p>
-                    {item.categoryName && (
-                      <span className="text-[11px] text-slate-500 block">{item.categoryName}</span>
+                  <div className="min-w-0 pr-1">
+                    <p className="text-xs font-bold text-[#1F294A] truncate">{item.serviceName}</p>
+                    {item.optionName ? (
+                      <span className="inline-block mt-0.5 text-[11px] font-bold text-secondary-800 bg-sand-100 px-2 py-0.5 rounded border border-sand-200">
+                        {item.optionName}
+                      </span>
+                    ) : (
+                      item.categoryName && (
+                        <span className="text-[11px] text-slate-500 block">{item.categoryName}</span>
+                      )
                     )}
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="px-2.5 py-1 rounded-lg bg-sand-100 text-secondary-800 text-xs font-bold border border-sand-200">
-                      الكمية: {item.quantity}
-                    </span>
+
+                  <div className="flex items-center gap-2 shrink-0 mr-2">
+                    <div className="inline-flex items-center gap-1 bg-slate-50 rounded-lg p-0.5 border border-slate-200">
+                      <button
+                        type="button"
+                        onClick={() => handleDecreaseQty(item.key)}
+                        className="w-5 h-5 rounded bg-white hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                        title="إنقاص الكمية"
+                      >
+                        <Minus className="w-2.5 h-2.5" />
+                      </button>
+                      <span className="min-w-6 text-center text-xs font-bold text-secondary-900">
+                        {item.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const svc = services.find((s) => s.id === item.serviceId);
+                          if (svc) {
+                            const opt = svc.options?.find((o) => o.id === item.optionId);
+                            handleIncreaseQty(svc, opt);
+                          }
+                        }}
+                        className="w-5 h-5 rounded bg-white hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs"
+                        title="زيادة الكمية"
+                      >
+                        <Plus className="w-2.5 h-2.5" />
+                      </button>
+                    </div>
+
                     <button
                       type="button"
                       onClick={() => handleRemoveItem(item.key)}
                       className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                      title="حذف الخدمة من الطلب"
-                      aria-label={`حذف ${item.serviceName}`}
+                      title="إزالة الخيار"
+                      aria-label={`إزالة ${item.optionName || item.serviceName}`}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

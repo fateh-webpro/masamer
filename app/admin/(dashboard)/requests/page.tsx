@@ -1,15 +1,21 @@
 import React from "react";
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import { getAllRequestsForAdmin } from "@/lib/services/request-dal";
 import {
   getRequestReference,
   REQUEST_STATUS_PRESENTATION,
   type RequestStatus,
 } from "@/lib/constants/request";
+import { DeleteRequestButton } from "@/components/admin/delete-request-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminRequestsPage() {
+export default async function AdminRequestsPage(props: {
+  searchParams?: Promise<{ deleted?: string }>;
+}) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
+  const showDeletedBanner = searchParams?.deleted === "true";
   const requests = await getAllRequestsForAdmin();
 
   return (
@@ -20,6 +26,16 @@ export default async function AdminRequestsPage() {
           متابعة طلبات العملاء وتفاصيل الخدمات والكميات وتحديث حالتها.
         </p>
       </div>
+
+      {showDeletedBanner && (
+        <div
+          role="status"
+          className="flex items-center gap-2.5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-semibold"
+        >
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span>تم حذف الطلب بنجاح والعودة إلى قائمة الطلبات.</span>
+        </div>
+      )}
 
       <div className="rounded-3xl bg-white border border-slate-200 overflow-x-auto shadow-sm">
         <table className="w-full text-sm text-right min-w-[950px]">
@@ -93,12 +109,20 @@ export default async function AdminRequestsPage() {
                     {new Date(request.createdAt).toLocaleDateString("ar-SA")}
                   </td>
                   <td className="p-4 text-center">
-                    <Link
-                      href={`/admin/requests/${request.id}`}
-                      className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-sand-100 hover:bg-secondary-50 text-secondary-800 hover:text-secondary-900 font-bold text-xs border border-sand-200 transition-colors"
-                    >
-                      عرض التفاصيل
-                    </Link>
+                    <div className="flex items-center justify-center gap-2">
+                      <Link
+                        href={`/admin/requests/${request.id}`}
+                        className="inline-flex items-center justify-center px-3 py-1.5 rounded-lg bg-sand-100 hover:bg-secondary-50 text-secondary-800 hover:text-secondary-900 font-bold text-xs border border-sand-200 transition-colors"
+                      >
+                        عرض التفاصيل
+                      </Link>
+                      <DeleteRequestButton
+                        requestId={request.id}
+                        customerName={request.customerName}
+                        reference={getRequestReference(request.id, request.createdAt)}
+                        variant="table"
+                      />
+                    </div>
                   </td>
                 </tr>
               );

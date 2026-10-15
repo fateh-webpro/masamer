@@ -13,6 +13,17 @@ export interface ServiceCategoryItem {
   _count?: { services: number };
 }
 
+export interface ServiceOptionItem {
+  id: string;
+  serviceId: string;
+  name: string;
+  description: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface ServiceItem {
   id: string;
   categoryId?: string | null;
@@ -29,6 +40,7 @@ export interface ServiceItem {
   updatedAt: Date;
   category?: { id: string; name: string; slug: string } | null;
   images: Array<{ id: string; serviceId: string; imagePath: string; altText: string | null; sortOrder: number; createdAt: Date }>;
+  options?: ServiceOptionItem[];
 }
 
 export function getServiceDisplayImage(
@@ -65,6 +77,10 @@ export async function getActiveServices(): Promise<ServiceItem[]> {
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         category: { select: { id: true, name: true, slug: true } },
+        options: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
       },
     });
 
@@ -87,6 +103,10 @@ export async function getServiceBySlug(
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         category: { select: { id: true, name: true, slug: true } },
+        options: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
       },
     });
 
@@ -109,6 +129,9 @@ export async function getAllServicesForAdmin(): Promise<ServiceItem[]> {
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         category: { select: { id: true, name: true, slug: true } },
+        options: {
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
       },
     });
 
@@ -131,6 +154,9 @@ export async function getServiceByIdForAdmin(
       include: {
         images: { orderBy: { sortOrder: "asc" } },
         category: { select: { id: true, name: true, slug: true } },
+        options: {
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
       },
     });
 
@@ -143,6 +169,18 @@ export async function getServiceByIdForAdmin(
   } catch (error) {
     console.error(`Error fetching service by id "${id}":`, error);
     return null;
+  }
+}
+
+export async function getServiceOptionsForAdmin(serviceId: string): Promise<ServiceOptionItem[]> {
+  try {
+    return await prisma.serviceOption.findMany({
+      where: { serviceId },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    });
+  } catch (error) {
+    console.error(`Error fetching service options for service "${serviceId}":`, error);
+    return [];
   }
 }
 

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Edit, ChevronLeft } from "lucide-react";
 import { getServiceByIdForAdmin } from "@/lib/services/service-dal";
 import { ServiceForm } from "@/components/admin/service-form";
+import { ServiceOptionsManager } from "@/components/admin/service-options-manager";
 import { updateServiceAction } from "@/app/admin/services/actions";
 
 export const dynamic = "force-dynamic";
@@ -57,11 +58,18 @@ export default async function EditServicePage({ params }: EditServicePageProps) 
               تعديل الخدمة: {service.title}
             </h1>
             <p className="text-slate-500 text-sm mt-0.5">
-              تحديث بيانات الخدمة، الوصف، المميزات، أو ترتيب وحالة العرض.
+              تحديث بيانات الخدمة، الوصف، المميزات، الخيارات الفرعية للطلب، أو ترتيب وحالة العرض.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Sub-Options Manager */}
+      <ServiceOptionsManager
+        serviceId={service.id}
+        serviceTitle={service.title}
+        initialOptions={service.options || []}
+      />
 
       {/* Form Card */}
       <ServiceForm

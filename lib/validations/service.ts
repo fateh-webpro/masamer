@@ -51,3 +51,13 @@ export const serviceCategorySchema = z.object({
 });
 
 export type ServiceCategoryInput = z.infer<typeof serviceCategorySchema>;
+
+export const serviceOptionSchema = z.object({
+  serviceId: z.string().min(1, "معرف الخدمة مطلوب"),
+  name: z.string().trim().min(2, "اسم الخيار مطلوب").max(180, "اسم الخيار طويل جداً"),
+  description: z.string().trim().max(300, "الوصف يجب ألا يتجاوز 300 حرف").optional().nullable(),
+  isActive: z.boolean().default(true),
+  sortOrder: z.coerce.number().int().default(0),
+});
+
+export type ServiceOptionInput = z.infer<typeof serviceOptionSchema>;

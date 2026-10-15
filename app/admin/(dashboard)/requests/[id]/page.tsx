@@ -9,6 +9,7 @@ import {
 } from "@/lib/constants/request";
 import { formatWhatsAppUrl } from "@/lib/utils";
 import { RequestUpdateForm } from "@/components/admin/request-update-form";
+import { DeleteRequestButton } from "@/components/admin/delete-request-button";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,11 @@ export default async function AdminRequestDetailPage({
     items?: Array<{
       id: string;
       serviceName: string;
+      optionName?: string | null;
       categoryName: string | null;
       quantity: number;
       notes: string | null;
+      option?: { name: string } | null;
     }>;
     district?: string | null;
     customRequest?: string | null;
@@ -120,6 +123,12 @@ export default async function AdminRequestDetailPage({
           >
             مراسلة واتساب
           </a>
+          <DeleteRequestButton
+            requestId={request.id}
+            customerName={request.customerName}
+            reference={getRequestReference(request.id, request.createdAt)}
+            variant="detail"
+          />
         </div>
       </div>
 
@@ -129,14 +138,14 @@ export default async function AdminRequestDetailPage({
           <div className="rounded-3xl bg-white border border-slate-200 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
               <div>
-                <h2 className="text-lg font-bold text-slate-900">الخدمات المطلوبة</h2>
+                <h2 className="text-lg font-bold text-slate-900">الخدمات والخيارات المطلوبة</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  قائمة الخدمات والكميات المحددة من العميل
+                  قائمة الخدمات والخيارات الفرعية والكميات المحددة من العميل
                 </p>
               </div>
               {hasItems && (
                 <span className="text-xs font-bold bg-sand-100 text-secondary-800 px-3 py-1 rounded-full border border-sand-200">
-                  {reqAny.items!.length} خدمات • إجمالي الكمية: {totalQuantity}
+                  {reqAny.items!.length} عناصر • إجمالي الكمية: {totalQuantity}
                 </span>
               )}
             </div>
@@ -147,34 +156,47 @@ export default async function AdminRequestDetailPage({
                   <thead className="bg-slate-50 text-slate-700 text-xs font-bold border-b border-slate-200">
                     <tr>
                       <th className="p-3">#</th>
-                      <th className="p-3">الخدمة</th>
+                      <th className="p-3">الخدمة الرئيسية</th>
+                      <th className="p-3">الخيار الفرعي</th>
                       <th className="p-3">التصنيف</th>
                       <th className="p-3 text-center">الكمية</th>
                       <th className="p-3">ملاحظات خاصة</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {reqAny.items!.map((item, idx) => (
-                      <tr key={item.id || idx} className="hover:bg-slate-50/60">
-                        <td className="p-3 text-xs text-slate-400 font-mono">{idx + 1}</td>
-                        <td className="p-3 font-bold text-slate-900">{item.serviceName}</td>
-                        <td className="p-3 text-xs text-slate-600">
-                          {item.categoryName ? (
-                            <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
-                              {item.categoryName}
+                    {reqAny.items!.map((item, idx) => {
+                      const subOption = item.optionName || item.option?.name;
+                      return (
+                        <tr key={item.id || idx} className="hover:bg-slate-50/60">
+                          <td className="p-3 text-xs text-slate-400 font-mono">{idx + 1}</td>
+                          <td className="p-3 font-bold text-slate-900">{item.serviceName}</td>
+                          <td className="p-3">
+                            {subOption ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-sand-100 text-secondary-900 font-bold text-xs border border-sand-200">
+                                {subOption}
+                              </span>
+                            ) : (
+                              <span className="text-xs text-slate-400">خدمة رئيسية عامة</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-xs text-slate-600">
+                            {item.categoryName ? (
+                              <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                                {item.categoryName}
+                              </span>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td className="p-3 text-center">
+                            <span className="inline-block bg-secondary-50 text-secondary-800 font-bold px-2.5 py-0.5 rounded-lg border border-secondary-200 text-xs">
+                              {item.quantity}
                             </span>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                        <td className="p-3 text-center">
-                          <span className="inline-block bg-secondary-50 text-secondary-800 font-bold px-2.5 py-0.5 rounded-lg border border-secondary-200 text-xs">
-                            {item.quantity}
-                          </span>
-                        </td>
-                        <td className="p-3 text-xs text-slate-600">{item.notes || "—"}</td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="p-3 text-xs text-slate-600">{item.notes || "—"}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

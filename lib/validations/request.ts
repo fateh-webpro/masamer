@@ -2,13 +2,20 @@ import { z } from "zod";
 import { REQUEST_STATUSES } from "@/lib/constants/request";
 
 export const requestItemSchema = z.object({
-  serviceId: z.string().trim().optional().nullable(),
-  serviceName: z.string().trim().min(1, "اسم الخدمة مطلوب").max(180),
+  serviceId: z.string().trim().min(1, "معرف الخدمة مطلوب").optional().nullable(),
+  optionId: z.string().trim().min(1, "معرف الخيار غير صالح").optional().nullable(),
+  serviceName: z.string().trim().max(180).optional().nullable(),
+  optionName: z.string().trim().max(180).optional().nullable(),
   categoryName: z.string().trim().max(120).optional().nullable(),
   quantity: z.coerce
-    .number()
+    .number({
+      invalid_type_error: "الكمية يجب أن تكون رقماً صحيحاً",
+      required_error: "الكمية مطلوبة",
+    })
     .int("الكمية يجب أن تكون رقماً صحيحاً")
-    .min(1, "الكمية يجب أن تكون 1 على الأقل"),
+    .min(1, "الكمية يجب أن تكون 1 على الأقل")
+    .max(1000, "الكمية يجب ألا تتجاوز 1000")
+    .refine((v) => Number.isFinite(v), "الكمية غير صالحة"),
 });
 
 export type RequestItemInput = z.infer<typeof requestItemSchema>;
@@ -47,7 +54,29 @@ export const serviceRequestSchema = z
     guestCount: z.string().trim().max(50).optional().nullable(),
     notes: z.string().trim().max(3000).optional().nullable(),
     customRequest: z.string().trim().max(3000).optional().nullable(),
-    items: z.array(requestItemSchema).default([]),
+    items: z
+      .array(requestItemSchema)
+      .max(50, "لا يمكن اختيار أكثر من 50 عنصراً في الطلب الواحد")
+      .default([])
+      .refine(
+        (items) => {
+          // Prevent duplicate options or services in the same request
+          const keys = new Set<string>();
+          for (const item of items) {
+            const itemKey = item.optionId
+              ? `${item.serviceId || ""}:${item.optionId}`
+              : `svc:${item.serviceId || item.serviceName || ""}`;
+            if (keys.has(itemKey)) {
+              return false;
+            }
+            keys.add(itemKey);
+          }
+          return true;
+        },
+        {
+          message: "لا يمكن تكرار الخيار الفرعي نفسه أكثر من مرة في الطلب، يرجى زيادة الكمية بدلاً من التكرار",
+        }
+      ),
     serviceId: z.string().trim().optional().nullable(),
   })
   .refine(
