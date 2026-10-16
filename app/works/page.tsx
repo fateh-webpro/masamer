@@ -11,18 +11,15 @@ import { Button } from "@/components/ui/button";
 export const revalidate = 60; // ISR cache revalidation
 
 export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
-  const siteName = settings.siteName || "مسامر";
-
   return {
-    title: `معرض الأعمال والتجهيزات | ${siteName}`,
+    title: "معرض الأعمال وتجهيزات المناسبات",
     description:
       "استكشف معرض أعمال مسامر الحقيقية في تجهيز الفعاليات الكبرى والمناسبات الملكية والخاصة، وخدمات القهوجيين والصبابين والتأثيث الفاخر في المملكة العربية السعودية.",
     alternates: {
       canonical: "https://masamersa.com/works",
     },
     openGraph: {
-      title: `معرض الأعمال والتجهيزات | ${siteName}`,
+      title: "معرض الأعمال وتجهيزات المناسبات",
       description:
         "شاهد نماذج من تجهيزاتنا الميدانية الفاخرة للفعاليات والمناسبات الملكية والخاصة في المملكة العربية السعودية.",
       url: "https://masamersa.com/works",

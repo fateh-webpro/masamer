@@ -6,14 +6,14 @@ import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { formatWhatsAppUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "تواصل معنا | مسامر لخدمات الضيافة والمناسبات",
+  title: "تواصل معنا - قنوات التواصل وحجز الضيافة",
   description:
     "قنوات التواصل الرسمية مع فريق مسامر لخدمات الضيافة والمناسبات في الرياض، جدة، والدمام. جاهزون لتلبية كافة متطلبات مناسبتك.",
   alternates: {
     canonical: "https://masamersa.com/contact",
   },
   openGraph: {
-    title: "تواصل معنا | مسامر",
+    title: "تواصل معنا - قنوات التواصل وحجز الضيافة",
     description: "قنوات التواصل الرسمية مع فريق مسامر لخدمات الضيافة والمناسبات.",
     url: "https://masamersa.com/contact",
   },

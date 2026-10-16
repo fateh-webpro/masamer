@@ -7,14 +7,14 @@ import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 
 export const metadata: Metadata = {
-  title: "من نحن | مسامر - حلول متكاملة للمناسبات والضيافة",
+  title: "من نحن - حلول متكاملة للمناسبات والضيافة",
   description:
     "تعرف على مسامر ورؤيتها في تقديم حلول متكاملة للمناسبات والضيافة في الرياض وجدة والدمام: خدمات الضيافة البشرية، الخيام وبيوت الشعر، الأثاث والجلسات، وتنسيق الديكورات.",
   alternates: {
     canonical: "https://masamersa.com/about",
   },
   openGraph: {
-    title: "من نحن | مسامر",
+    title: "من نحن - حلول متكاملة للمناسبات والضيافة",
     description: "تعرف على مسامر ورؤيتها في تقديم حلول متكاملة للمناسبات والضيافة.",
     url: "https://masamersa.com/about",
   },

@@ -9,14 +9,14 @@ import { RequestModalTrigger } from "@/components/request/request-modal-provider
 import { isRuntimeUploadPath } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "خدمات الضيافة والمناسبات | مسامر",
+  title: "خدمات الضيافة وتجهيز المناسبات",
   description:
     "استكشف خدمات مسامر المتكاملة للمناسبات: خدمات الضيافة البشرية والقهوجيين، الخيام وبيوت الشعر، الأثاث والجلسات، وتنسيق الديكورات في الرياض وجدة والدمام.",
   alternates: {
     canonical: "https://masamersa.com/services",
   },
   openGraph: {
-    title: "خدمات الضيافة والمناسبات | مسامر",
+    title: "خدمات الضيافة وتجهيز المناسبات",
     description:
       "حلول متكاملة للمناسبات والضيافة في الرياض وجدة والدمام: خدمات الضيافة البشرية، الخيام وبيوت الشعر، الأثاث والجلسات، وديكورات وتنسيق المناسبات.",
     url: "https://masamersa.com/services",

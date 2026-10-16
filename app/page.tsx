@@ -26,30 +26,48 @@ export default async function HomePage() {
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: settings.siteName || "مسامر",
-    alternateName: "مسامر - حلول متكاملة للمناسبات والضيافة",
-    description:
-      settings.seoDescription || settings.shortDescription || siteConfig.description,
-    url: "https://masamersa.com",
-    telephone: settings.phone,
-    email: settings.email || siteConfig.contact.email,
-    areaServed: [
-      { "@type": "City", name: "الرياض" },
-      { "@type": "City", name: "جدة" },
-      { "@type": "City", name: "الدمام" },
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://masamersa.com/#website",
+        url: "https://masamersa.com",
+        name: settings.siteName || "مسامر",
+        alternateName: "مسامر - حلول متكاملة للمناسبات والضيافة",
+        description:
+          settings.seoDescription || settings.shortDescription || siteConfig.description,
+        inLanguage: "ar",
+        publisher: {
+          "@id": "https://masamersa.com/#organization",
+        },
+      },
+      {
+        "@type": "LocalBusiness",
+        "@id": "https://masamersa.com/#organization",
+        name: settings.siteName || "مسامر",
+        alternateName: "مسامر - حلول متكاملة للمناسبات والضيافة",
+        description:
+          settings.seoDescription || settings.shortDescription || siteConfig.description,
+        url: "https://masamersa.com",
+        telephone: settings.phone,
+        email: settings.email || siteConfig.contact.email,
+        areaServed: [
+          { "@type": "City", name: "الرياض" },
+          { "@type": "City", name: "جدة" },
+          { "@type": "City", name: "الدمام" },
+        ],
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "SA",
+          addressRegion: "المملكة العربية السعودية",
+        },
+        sameAs: [
+          settings.xUrl,
+          settings.instagramUrl,
+          settings.snapchatUrl,
+          settings.tiktokUrl,
+        ].filter((url): url is string => Boolean(url && url.trim())),
+      },
     ],
-    address: {
-      "@type": "PostalAddress",
-      addressCountry: "SA",
-      addressRegion: "المملكة العربية السعودية",
-    },
-    sameAs: [
-      settings.xUrl,
-      settings.instagramUrl,
-      settings.snapchatUrl,
-      settings.tiktokUrl,
-    ].filter((url): url is string => Boolean(url && url.trim())),
   };
 
   return (

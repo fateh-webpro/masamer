@@ -33,18 +33,18 @@ export async function generateMetadata({
 
   if (!item) {
     return {
-      title: "العمل غير موجود | مسامر",
+      title: "العمل غير موجود",
     };
   }
 
   return {
-    title: `${item.title} | أعمال مسامر`,
+    title: item.title,
     description: item.shortDescription,
     alternates: {
       canonical: `https://masamersa.com/works/${item.slug}`,
     },
     openGraph: {
-      title: `${item.title} | أعمال مسامر`,
+      title: item.title,
       description: item.shortDescription,
       url: `https://masamersa.com/works/${item.slug}`,
       images: [
@@ -58,7 +58,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${item.title} | أعمال مسامر`,
+      title: item.title,
       description: item.shortDescription,
       images: [item.coverImagePath],
     },
@@ -88,8 +88,37 @@ export default async function WorkDetailPage({ params }: WorkDetailPageProps) {
     `مرحباً مسامر، أود الاستفسار وطلب تجهيز مماثل لعمل (${item.title}).`
   );
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "الرئيسية",
+        item: "https://masamersa.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "أعمالنا",
+        item: "https://masamersa.com/works",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: item.title,
+        item: `https://masamersa.com/works/${item.slug}`,
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-sand-50/50 pb-24 pt-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs sm:text-sm text-slate-500 mb-8" aria-label="مسار التصفح">
