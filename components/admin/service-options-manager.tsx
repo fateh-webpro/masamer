@@ -53,13 +53,17 @@ export function ServiceOptionsManager({
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    const trimmedName = newName.trim();
+    if (!trimmedName) {
+      setMessage({ text: "يرجى إدخال اسم الخيار الفرعي أولاً", type: "error" });
+      return;
+    }
 
     startTransition(async () => {
       setMessage(null);
       const fd = new FormData();
       fd.set("serviceId", serviceId);
-      fd.set("name", newName.trim());
+      fd.set("name", trimmedName);
       fd.set("description", newDesc.trim());
       fd.set("isActive", "true");
       fd.set("sortOrder", String(newSortOrder));
@@ -89,12 +93,16 @@ export function ServiceOptionsManager({
   };
 
   const handleUpdate = (id: string) => {
-    if (!editName.trim()) return;
+    const trimmedName = editName.trim();
+    if (!trimmedName) {
+      setMessage({ text: "يرجى إدخال اسم الخيار الفرعي", type: "error" });
+      return;
+    }
 
     startTransition(async () => {
       setMessage(null);
       const fd = new FormData();
-      fd.set("name", editName.trim());
+      fd.set("name", trimmedName);
       fd.set("description", editDesc.trim());
       fd.set("sortOrder", String(editSortOrder));
       fd.set("isActive", editIsActive ? "true" : "false");
@@ -111,7 +119,7 @@ export function ServiceOptionsManager({
               o.id === id
                 ? {
                     ...o,
-                    name: editName.trim(),
+                    name: trimmedName,
                     description: editDesc.trim() || null,
                     sortOrder: editSortOrder,
                     isActive: editIsActive,
@@ -218,13 +226,16 @@ export function ServiceOptionsManager({
       {isAdding && (
         <form
           onSubmit={handleCreate}
-          className="rounded-2xl border border-secondary-200 bg-sand-50/70 p-4 sm:p-5 space-y-4"
+          className="rounded-2xl border border-sand-300 bg-sand-50/70 p-4 sm:p-5 space-y-4"
         >
           <div className="flex items-center justify-between border-b border-sand-200 pb-2">
-            <h3 className="text-xs font-bold text-secondary-900">إضافة خيار فرعي جديد</h3>
+            <h3 className="text-xs font-bold text-slate-900">إضافة خيار فرعي جديد</h3>
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
+              onClick={() => {
+                setIsAdding(false);
+                setMessage(null);
+              }}
               className="text-slate-400 hover:text-slate-600"
             >
               <X className="w-4 h-4" />
@@ -242,7 +253,7 @@ export function ServiceOptionsManager({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="مثال: قهوجيون، صبابات، خيام أندلسية..."
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-secondary-500/30"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-(--secondary)/20 focus:border-(--secondary)"
               />
             </div>
 
@@ -255,7 +266,7 @@ export function ServiceOptionsManager({
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
                 placeholder="مواصفات أو إيضاح للخيار..."
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-secondary-500/30"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-(--secondary)/20 focus:border-(--secondary)"
               />
             </div>
 
@@ -267,26 +278,39 @@ export function ServiceOptionsManager({
                 type="number"
                 value={newSortOrder}
                 onChange={(e) => setNewSortOrder(parseInt(e.target.value, 10) || 0)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-900 text-center font-bold"
+                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white text-slate-900 text-center font-bold focus:outline-none focus:ring-2 focus:ring-(--secondary)/20 focus:border-(--secondary)"
               />
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2 border-t border-sand-200/80">
             <button
               type="button"
-              onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-100"
+              onClick={() => {
+                setIsAdding(false);
+                setMessage(null);
+              }}
+              disabled={isPending}
+              className="px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors disabled:opacity-50"
             >
               إلغاء
             </button>
             <button
               type="submit"
-              disabled={isPending || !newName.trim()}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-secondary-700 hover:bg-secondary-800 text-white text-xs font-bold disabled:opacity-50"
+              disabled={isPending}
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl bg-(--secondary) hover:bg-(--secondary-light) text-white text-xs font-bold shadow-sm transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              <span>حفظ الخيار</span>
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>جاري الإضافة...</span>
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4" />
+                  <span>إضافة الخيار الفرعي</span>
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -301,7 +325,7 @@ export function ServiceOptionsManager({
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full text-right text-xs">
+          <table className="w-full text-right text-xs min-w-[640px]">
             <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
               <tr>
                 <th className="p-3">#</th>
@@ -329,7 +353,7 @@ export function ServiceOptionsManager({
                           type="text"
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
-                          className="w-full px-2 py-1 rounded border border-secondary-400 text-xs"
+                          className="w-full px-2 py-1 rounded border border-(--secondary) text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-(--secondary)"
                         />
                       ) : (
                         <span className="font-bold text-slate-900">{opt.name}</span>
@@ -341,7 +365,7 @@ export function ServiceOptionsManager({
                           type="text"
                           value={editDesc}
                           onChange={(e) => setEditDesc(e.target.value)}
-                          className="w-full px-2 py-1 rounded border border-slate-300 text-xs"
+                          className="w-full px-2 py-1 rounded border border-slate-300 text-xs bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-(--secondary)"
                         />
                       ) : (
                         opt.description || "—"
@@ -353,7 +377,7 @@ export function ServiceOptionsManager({
                           type="number"
                           value={editSortOrder}
                           onChange={(e) => setEditSortOrder(parseInt(e.target.value, 10) || 0)}
-                          className="w-16 px-1.5 py-1 rounded border border-slate-300 text-xs text-center font-bold"
+                          className="w-16 px-1.5 py-1 rounded border border-slate-300 text-xs text-center font-bold bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-(--secondary)"
                         />
                       ) : (
                         <span className="font-bold text-slate-700">{opt.sortOrder}</span>
@@ -379,61 +403,66 @@ export function ServiceOptionsManager({
                         </span>
                       )}
                     </td>
-                    <td className="p-3 text-center">
-                      <div className="flex items-center justify-center gap-1.5">
-                        {isEditing ? (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdate(opt.id)}
-                              disabled={isPending}
-                              className="p-1 rounded bg-emerald-600 text-white hover:bg-emerald-700"
-                              title="حفظ"
-                            >
+                    <td className="p-3 text-center whitespace-nowrap">
+                      {isEditing ? (
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdate(opt.id)}
+                            disabled={isPending}
+                            className="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                            title="حفظ التعديلات"
+                          >
+                            {isPending ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
                               <Check className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={cancelEdit}
-                              className="p-1 rounded bg-slate-200 text-slate-700 hover:bg-slate-300"
-                              title="إلغاء"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => startEdit(opt)}
-                              className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-                              title="تعديل الخيار"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleToggle(opt.id, opt.isActive)}
-                              className={`p-1.5 rounded-lg transition-colors ${
-                                opt.isActive
-                                  ? "text-emerald-600 hover:bg-emerald-50"
-                                  : "text-slate-400 hover:bg-slate-100"
-                              }`}
-                              title={opt.isActive ? "تعطيل الخيار" : "تفعيل الخيار"}
-                            >
-                              <Power className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteOrDeactivate(opt.id, opt.name)}
-                              className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                              title="تعطيل / حذف آمن"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </>
-                        )}
-                      </div>
+                            )}
+                            <span>حفظ التعديلات</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEdit}
+                            disabled={isPending}
+                            className="inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-colors disabled:opacity-50"
+                            title="إلغاء التعديل"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                            <span>إلغاء</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => startEdit(opt)}
+                            className="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+                            title="تعديل الخيار"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleToggle(opt.id, opt.isActive)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              opt.isActive
+                                ? "text-emerald-600 hover:bg-emerald-50"
+                                : "text-slate-400 hover:bg-slate-100"
+                            }`}
+                            title={opt.isActive ? "تعطيل الخيار" : "تفعيل الخيار"}
+                          >
+                            <Power className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteOrDeactivate(opt.id, opt.name)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                            title="تعطيل / حذف آمن"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
