@@ -38,6 +38,8 @@ export interface ServiceItem {
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
   category?: { id: string; name: string; slug: string } | null;
   images: Array<{ id: string; serviceId: string; imagePath: string; altText: string | null; sortOrder: number; createdAt: Date }>;
   options?: ServiceOptionItem[];

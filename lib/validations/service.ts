@@ -30,6 +30,20 @@ export const serviceSchema = z.object({
   categoryId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   sortOrder: z.coerce.number().int().default(0),
+  seoTitle: z
+    .string()
+    .trim()
+    .max(200, "عنوان SEO يجب ألا يتجاوز 200 حرف")
+    .optional()
+    .nullable()
+    .transform((val) => (val ? val : null)),
+  seoDescription: z
+    .string()
+    .trim()
+    .max(400, "وصف SEO يجب ألا يتجاوز 400 حرف")
+    .optional()
+    .nullable()
+    .transform((val) => (val ? val : null)),
 });
 
 export type ServiceInput = z.infer<typeof serviceSchema>;

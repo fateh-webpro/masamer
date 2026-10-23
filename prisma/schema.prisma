@@ -35,6 +35,8 @@ model Service {
   features         Json                 @default("[]")
   isActive         Boolean              @default(true)
   sortOrder        Int                  @default(0)
+  seoTitle         String?              @db.VarChar(200)
+  seoDescription   String?              @db.VarChar(400)
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
   category         ServiceCategory?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -224,4 +226,21 @@ model PortfolioImage {
 
   @@index([portfolioItemId, sortOrder])
   @@map("portfolio_images")
+}
+
+model SeoPageSetting {
+  id                String   @id @default(cuid())
+  pageKey           String   @unique @db.VarChar(255)
+  pageType          String   @db.VarChar(30)
+  entityId          String?  @db.VarChar(191)
+  seoTitle          String?  @db.VarChar(200)
+  seoDescription    String?  @db.VarChar(400)
+  primaryKeyword    String?  @db.VarChar(160)
+  secondaryKeywords Json?
+  localKeywords     Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([pageType, entityId])
+  @@map("seo_page_settings")
 }

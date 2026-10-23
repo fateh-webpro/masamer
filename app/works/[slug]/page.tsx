@@ -20,6 +20,7 @@ import { GalleryLightbox } from "@/components/portfolio/gallery-lightbox";
 import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { RequestModalTrigger } from "@/components/request/request-modal-provider";
+import { getManagedPageMetadata } from "@/lib/services/page-metadata";
 
 interface WorkDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -37,32 +38,13 @@ export async function generateMetadata({
     };
   }
 
-  return {
-    title: item.title,
-    description: item.shortDescription,
-    alternates: {
-      canonical: `https://masamersa.com/works/${item.slug}`,
-    },
-    openGraph: {
-      title: item.title,
-      description: item.shortDescription,
-      url: `https://masamersa.com/works/${item.slug}`,
-      images: [
-        {
-          url: item.coverImagePath,
-          width: 1200,
-          height: 630,
-          alt: item.title,
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: item.title,
-      description: item.shortDescription,
-      images: [item.coverImagePath],
-    },
-  };
+  return getManagedPageMetadata({
+    pageKey: `portfolio:${item.id}`,
+    canonicalPath: `/works/${item.slug}`,
+    fallbackTitle: item.title,
+    fallbackDescription: item.shortDescription,
+    image: item.coverImagePath,
+  });
 }
 
 export async function generateStaticParams() {

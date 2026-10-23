@@ -7,21 +7,16 @@ import { ServiceIcon } from "@/components/shared/service-icon";
 import { Button } from "@/components/ui/button";
 import { RequestModalTrigger } from "@/components/request/request-modal-provider";
 import { isRuntimeUploadPath } from "@/lib/utils";
+import { getManagedPageMetadata } from "@/lib/services/page-metadata";
 
-export const metadata: Metadata = {
-  title: "خدمات الضيافة وتجهيز المناسبات",
-  description:
-    "استكشف خدمات مسامر المتكاملة للمناسبات: خدمات الضيافة البشرية والقهوجيين، الخيام وبيوت الشعر، الأثاث والجلسات، وتنسيق الديكورات في الرياض وجدة والدمام.",
-  alternates: {
-    canonical: "https://masamersa.com/services",
-  },
-  openGraph: {
-    title: "خدمات الضيافة وتجهيز المناسبات",
-    description:
-      "حلول متكاملة للمناسبات والضيافة في الرياض وجدة والدمام: خدمات الضيافة البشرية، الخيام وبيوت الشعر، الأثاث والجلسات، وديكورات وتنسيق المناسبات.",
-    url: "https://masamersa.com/services",
-  },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return getManagedPageMetadata({
+    pageKey: "static:services",
+    canonicalPath: "/services",
+    fallbackTitle: "خدمات الضيافة وتجهيز المناسبات والحفلات",
+    fallbackDescription: "خدمات ضيافة وقهوجيين وصبابين قهوة للمناسبات، مع خيام وبيوت شعر، وتجهيز الجلسات، وديكورات الحفلات وتنسيق المناسبات.",
+  });
+}
 
 export const revalidate = 60; // ISR cache revalidation
 
@@ -37,10 +32,10 @@ export default async function ServicesPage() {
           <span>خدمات ضيافة مصممة لأرقى المناسبات</span>
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-primary-950 mb-4 tracking-tight">
-          خدمات الضيافة المتكاملة
+          خدمات الضيافة وتجهيز المناسبات
         </h1>
         <p className="text-slate-600 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
-          نقدم باقة مختارة من خدمات القهوة السعودية والمشروبات التراثية بإشراف كوادر وطنية متمرسة تجمع بين عراقة التقاليد ودقة التنظيم.
+          اختر ما تحتاجه من خدمات الضيافة والقهوجيين وصبابين القهوة والقهوجيات والصبابات، أو خيام المناسبات وبيوت الشعر، أو تجهيز الجلسات وديكورات الحفلات وتنسيق المناسبات.
         </p>
       </section>
 

@@ -2,6 +2,8 @@ import React from "react";
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { SiteSettingsForm } from "@/components/admin/site-settings-form";
+import { SeoSettingsManager } from "@/components/admin/seo-settings-manager";
+import { getSeoAdminTargets } from "@/lib/services/seo-page-setting-dal";
 
 export const metadata: Metadata = {
   title: "إعدادات وهوية الموقع | لوحة التحكم - مسامر",
@@ -11,7 +13,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminSiteSettingsPage() {
-  const settings = await getSiteSettings();
+  const [settings, seoTargets] = await Promise.all([
+    getSiteSettings(),
+    getSeoAdminTargets(),
+  ]);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -25,6 +30,7 @@ export default async function AdminSiteSettingsPage() {
       </div>
 
       <SiteSettingsForm initialData={settings} />
+      <SeoSettingsManager targets={seoTargets} />
     </div>
   );
 }

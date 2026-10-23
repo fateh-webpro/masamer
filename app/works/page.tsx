@@ -7,24 +7,17 @@ import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { PortfolioGrid } from "@/components/portfolio/portfolio-grid";
 import { formatWhatsAppUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { getManagedPageMetadata } from "@/lib/services/page-metadata";
 
 export const revalidate = 60; // ISR cache revalidation
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "معرض الأعمال وتجهيزات المناسبات",
-    description:
-      "استكشف معرض أعمال مسامر الحقيقية في تجهيز الفعاليات الكبرى والمناسبات الملكية والخاصة، وخدمات القهوجيين والصبابين والتأثيث الفاخر في المملكة العربية السعودية.",
-    alternates: {
-      canonical: "https://masamersa.com/works",
-    },
-    openGraph: {
-      title: "معرض الأعمال وتجهيزات المناسبات",
-      description:
-        "شاهد نماذج من تجهيزاتنا الميدانية الفاخرة للفعاليات والمناسبات الملكية والخاصة في المملكة العربية السعودية.",
-      url: "https://masamersa.com/works",
-    },
-  };
+  return getManagedPageMetadata({
+    pageKey: "static:works",
+    canonicalPath: "/works",
+    fallbackTitle: "معرض الأعمال وتجهيزات المناسبات",
+    fallbackDescription: "استكشف معرض أعمال مسامر في تجهيز الفعاليات والمناسبات وخدمات الضيافة والتأثيث.",
+  });
 }
 
 export default async function WorksPage() {

@@ -5,8 +5,9 @@ import { MasamerDiamondMotif, MasamerFlourish } from "@/components/shared/decora
 import { Reveal } from "@/components/shared/reveal";
 import { getSiteSettings } from "@/lib/services/site-setting-dal";
 import { RequestModalTrigger } from "@/components/request/request-modal-provider";
+import { getManagedPageMetadata } from "@/lib/services/page-metadata";
 
-export const metadata: Metadata = {
+const legacyMetadata: Metadata = {
   title: "من نحن - حلول متكاملة للمناسبات والضيافة",
   description:
     "تعرف على مسامر ورؤيتها في تقديم حلول متكاملة للمناسبات والضيافة في الرياض وجدة والدمام: خدمات الضيافة البشرية، الخيام وبيوت الشعر، الأثاث والجلسات، وتنسيق الديكورات.",
@@ -19,6 +20,15 @@ export const metadata: Metadata = {
     url: "https://masamersa.com/about",
   },
 };
+
+export function generateMetadata(): Promise<Metadata> {
+  return getManagedPageMetadata({
+    pageKey: "static:about",
+    canonicalPath: "/about",
+    fallbackTitle: String(legacyMetadata.title),
+    fallbackDescription: String(legacyMetadata.description),
+  });
+}
 
 const values = [
   { title: "الأصالة", icon: Coffee },

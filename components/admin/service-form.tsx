@@ -13,6 +13,8 @@ import {
   ImageIcon,
   Trash2,
   Upload,
+  Search,
+  Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ServiceIcon, SERVICE_ICONS } from "@/components/shared/service-icon";
@@ -48,6 +50,15 @@ const ICON_LABELS: Record<string, string> = {
 export function ServiceForm({ initialData, categories = [], formAction, mode }: ServiceFormProps) {
   const [state, action, isPending] = useActionState(formAction, null);
 
+  const [title, setTitle] = useState<string>(initialData?.title || "");
+  const [shortDescription, setShortDescription] = useState<string>(
+    initialData?.shortDescription || ""
+  );
+  const [seoTitle, setSeoTitle] = useState<string>(initialData?.seoTitle || "");
+  const [seoDescription, setSeoDescription] = useState<string>(
+    initialData?.seoDescription || ""
+  );
+
   const [selectedIcon, setSelectedIcon] = useState<string>(
     initialData?.icon || "Coffee"
   );
@@ -68,6 +79,7 @@ export function ServiceForm({ initialData, categories = [], formAction, mode }: 
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
+    setTitle(val);
     if (isAutoSlug && mode === "create") {
       // Generate clean english slug fallback or keep user choice
       const auto = val
@@ -120,7 +132,7 @@ export function ServiceForm({ initialData, categories = [], formAction, mode }: 
               id="title"
               name="title"
               required
-              defaultValue={initialData?.title || ""}
+              value={title}
               onChange={handleTitleChange}
               placeholder="مثال: الضيافة النجدية الملكية"
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
@@ -206,7 +218,8 @@ export function ServiceForm({ initialData, categories = [], formAction, mode }: 
             name="shortDescription"
             required
             rows={2}
-            defaultValue={initialData?.shortDescription || ""}
+            value={shortDescription}
+            onChange={(e) => setShortDescription(e.target.value)}
             placeholder="موجز جذاب لا يتجاوز سطرين يشرح جوهر الخدمة للعميل..."
             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500 resize-y"
           />
@@ -372,6 +385,163 @@ export function ServiceForm({ initialData, categories = [], formAction, mode }: 
             />
             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
           </label>
+        </div>
+      </div>
+
+      {/* SEO Section */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
+        <div className="border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-secondary-100 text-secondary-700 flex items-center justify-center shrink-0">
+              <Search className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">
+                تحسين محركات البحث (SEO)
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                تخصيص عنوان ووصف الخدمة في نتائج محركات البحث ومشاركات التواصل الاجتماعي.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SEO Title Input */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="seoTitle"
+              className="block text-sm font-semibold text-slate-800"
+            >
+              عنوان SEO المخصص (Title Tag){" "}
+              <span className="text-xs font-normal text-slate-400">(اختياري)</span>
+            </label>
+            <span
+              className={`text-xs font-mono font-medium ${
+                seoTitle.length > 200
+                  ? "text-rose-600 font-bold"
+                  : seoTitle.length > 60
+                  ? "text-amber-600"
+                  : "text-slate-400"
+              }`}
+            >
+              {seoTitle.length} / 200 حرف
+            </span>
+          </div>
+          <input
+            type="text"
+            id="seoTitle"
+            name="seoTitle"
+            maxLength={200}
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            placeholder={`مثال: ${title || "خدمات الضيافة البشرية والقهوجيين"} في الرياض وجدة`}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500"
+          />
+          <div className="mt-1.5 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 gap-1">
+            <p>
+              يحدد العنوان الذي يظهر في نتائج Google ومشاركات الروابط. في حال تركه فارغًا، سيتم استخدام عنوان الخدمة تلقائيًا.
+            </p>
+            <p className="text-slate-400 shrink-0">
+              المعدل المثالي الاسترشادي: 40 - 60 حرفًا
+            </p>
+          </div>
+          {state?.fieldErrors?.seoTitle && (
+            <p className="mt-1.5 text-xs text-rose-600 font-medium">
+              {state.fieldErrors.seoTitle[0]}
+            </p>
+          )}
+        </div>
+
+        {/* SEO Description Input */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="seoDescription"
+              className="block text-sm font-semibold text-slate-800"
+            >
+              وصف SEO المخصص (Meta Description){" "}
+              <span className="text-xs font-normal text-slate-400">(اختياري)</span>
+            </label>
+            <span
+              className={`text-xs font-mono font-medium ${
+                seoDescription.length > 400
+                  ? "text-rose-600 font-bold"
+                  : seoDescription.length > 160
+                  ? "text-amber-600"
+                  : "text-slate-400"
+              }`}
+            >
+              {seoDescription.length} / 400 حرف
+            </span>
+          </div>
+          <textarea
+            id="seoDescription"
+            name="seoDescription"
+            rows={3}
+            maxLength={400}
+            value={seoDescription}
+            onChange={(e) => setSeoDescription(e.target.value)}
+            placeholder="مقتطف تسويقي واضح ومحدد يظهر في محركات البحث لجذب العملاء لمناسباتهم..."
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary-500/30 focus:border-secondary-500 resize-y"
+          />
+          <div className="mt-1.5 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-500 gap-1">
+            <p>
+              وصف جذاب يوضح قيمة الخدمة للباحث. في حال تركه فارغًا، سيتم استخدام الوصف المختصر للخدمة تلقائيًا.
+            </p>
+            <p className="text-slate-400 shrink-0">
+              المعدل المثالي الاسترشادي: 120 - 160 حرفًا
+            </p>
+          </div>
+          {state?.fieldErrors?.seoDescription && (
+            <p className="mt-1.5 text-xs text-rose-600 font-medium">
+              {state.fieldErrors.seoDescription[0]}
+            </p>
+          )}
+        </div>
+
+        {/* Live Search Engine Result Preview */}
+        <div className="pt-4 border-t border-slate-100">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-secondary-600" />
+              <span>معاينة تقريبية لنتيجة محرك البحث (Google Preview)</span>
+            </span>
+            <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">
+              معاينة توضيحية مباشرة
+            </span>
+          </div>
+
+          <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+            {/* Google Result URL Breadcrumb */}
+            <div className="flex items-center gap-2 text-xs text-slate-600" dir="ltr">
+              <div className="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-700">
+                M
+              </div>
+              <div className="flex flex-col text-left leading-tight">
+                <span className="text-[11px] font-medium text-slate-800">مسامر | MASAMER</span>
+                <span className="text-[10px] text-slate-500 truncate max-w-xs sm:max-w-md">
+                  https://masamersa.com/services/{slug.trim() || "service-slug"}
+                </span>
+              </div>
+            </div>
+
+            {/* Google Result Title */}
+            <h3 className="text-base sm:text-lg font-semibold text-[#1a0dab] hover:underline cursor-pointer leading-snug">
+              {(seoTitle.trim() || title.trim() || "عنوان الخدمة") + " | مسامر"}
+            </h3>
+
+            {/* Google Result Snippet */}
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-2">
+              {seoDescription.trim() ||
+                shortDescription.trim() ||
+                "وصف الخدمة الذي سيظهر في نتائج محركات البحث لتقديم لمحة سريعة لزوار الموقع والباحثين في Google..."}
+            </p>
+          </div>
+
+          <p className="mt-2 text-[10px] text-slate-400 leading-relaxed">
+            * تنبيه توضيحي: هذه المعاينة تحاكي الشكل المتوقع استرشاديًا فقط؛ تقوم خوارزميات محركات البحث بتحديد العرض النهائي للعنوان والوصف وفق سياق بحث المستخدم وطول الشاشة.
+          </p>
         </div>
       </div>
 

@@ -11,12 +11,16 @@ export interface ServiceFormState { error?: string; fieldErrors?: Record<string,
 
 function values(formData: FormData) {
   const categoryId = String(formData.get("categoryId") || "").trim() || null;
+  const seoTitle = String(formData.get("seoTitle") || "").trim() || null;
+  const seoDescription = String(formData.get("seoDescription") || "").trim() || null;
   return {
     title: String(formData.get("title") || "").trim(), slug: String(formData.get("slug") || "").trim().toLowerCase(),
     categoryId,
     shortDescription: String(formData.get("shortDescription") || "").trim(), fullDescription: String(formData.get("fullDescription") || "").trim(),
     icon: String(formData.get("icon") || "Coffee").trim(), features: String(formData.get("features") || "").split("\n").map((v) => v.trim()).filter(Boolean),
     isActive: formData.get("isActive") === "true" || formData.get("isActive") === "on", sortOrder: Number(formData.get("sortOrder") || 0),
+    seoTitle,
+    seoDescription,
   };
 }
 function revalidateServicePaths(slugs: string[]) { revalidatePath("/admin/services"); revalidatePath("/services"); revalidatePath("/"); slugs.filter(Boolean).forEach((slug) => revalidatePath(`/services/${slug}`)); }

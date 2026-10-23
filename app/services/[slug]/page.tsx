@@ -19,11 +19,16 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { formatWhatsAppUrl, isRuntimeUploadPath } from "@/lib/utils";
 import { SharedGalleryLightbox } from "@/components/shared/gallery-lightbox";
 import { RequestModalTrigger } from "@/components/request/request-modal-provider";
+import { getServiceSeoProfile } from "@/lib/services/service-seo";
 
 interface ServicePageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+function cleanTitleForTemplate(rawTitle: string): string {
+  return rawTitle.replace(/\s*[|–-]\s*(?:مسامر|مسـامر|MASAMER)\s*$/i, "").trim();
 }
 
 export async function generateMetadata({
@@ -38,24 +43,33 @@ export async function generateMetadata({
     };
   }
 
+  const seoProfile = getServiceSeoProfile(service.slug);
+  const metaTitle = cleanTitleForTemplate(
+    service.seoTitle?.trim() || seoProfile.title || service.title
+  );
+  const metaDescription =
+    service.seoDescription?.trim() ||
+    seoProfile.description ||
+    service.shortDescription;
+
   const displayImage = getServiceDisplayImage(service);
 
   return {
-    title: service.title,
-    description: service.shortDescription,
+    title: metaTitle,
+    description: metaDescription,
     alternates: {
       canonical: `https://masamersa.com/services/${service.slug}`,
     },
     openGraph: {
-      title: service.title,
-      description: service.shortDescription,
+      title: metaTitle,
+      description: metaDescription,
       url: `https://masamersa.com/services/${service.slug}`,
       ...(displayImage ? { images: [{ url: displayImage, alt: service.title }] } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title: service.title,
-      description: service.shortDescription,
+      title: metaTitle,
+      description: metaDescription,
       ...(displayImage ? { images: [displayImage] } : {}),
     },
   };
@@ -90,6 +104,7 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
   );
   const displayImage = getServiceDisplayImage(service);
   const galleryImages = service.images.filter((image) => image.imagePath !== displayImage);
+  const seoProfile = getServiceSeoProfile(service.slug);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -98,18 +113,13 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
         "@type": "Service",
         "@id": `https://masamersa.com/services/${service.slug}#service`,
         name: service.title,
-        description: service.shortDescription,
+        description: service.seoDescription?.trim() || seoProfile.description || service.shortDescription,
         provider: {
           "@type": "LocalBusiness",
           "@id": "https://masamersa.com/#organization",
           name: settings.siteName || "مسامر",
           url: "https://masamersa.com",
         },
-        areaServed: [
-          { "@type": "City", name: "الرياض" },
-          { "@type": "City", name: "جدة" },
-          { "@type": "City", name: "الدمام" },
-        ],
         url: `https://masamersa.com/services/${service.slug}`,
         ...(displayImage ? { image: displayImage } : {}),
       },
@@ -246,11 +256,11 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                 </span>
 
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
-                  جاهزون لتشريف مناسبتكم القادمة
+                  {seoProfile.requestTitle}
                 </h3>
 
                 <p className="text-[#F8F6F3]/80 text-sm leading-relaxed mb-6 sm:mb-8 font-normal">
-                  فريقنا المتخصص مستعد لترتيب كافة تفاصيل الضيافة بما يليق بضيوفكم ومقام مناسبتكم.
+                  {seoProfile.requestDescription}
                 </p>
 
                 <div className="space-y-3.5 mb-8">
@@ -258,19 +268,19 @@ export default async function ServiceDetailPage({ params }: ServicePageProps) {
                     <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
                       <ShieldCheck className="w-4 h-4" />
                     </div>
-                    <span className="leading-snug">كوادر سعودية مدربة ومؤهلة</span>
+                    <span className="leading-snug">{seoProfile.requestPoints[0]}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-[#F8F6F3]">
                     <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
                       <Clock className="w-4 h-4" />
                     </div>
-                    <span className="leading-snug">التزام دقيق بالمواعيد والجاهزية المبكرة</span>
+                    <span className="leading-snug">{seoProfile.requestPoints[1]}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-[#F8F6F3]">
                     <div className="w-8 h-8 rounded-lg bg-[#C2704B]/15 text-[#D69A7E] flex items-center justify-center shrink-0 border border-[#C2704B]/25">
                       <Award className="w-4 h-4" />
                     </div>
-                    <span className="leading-snug">أواني فاخرة ومعدات ضيافة متكاملة</span>
+                    <span className="leading-snug">{seoProfile.requestPoints[2]}</span>
                   </div>
                 </div>
 
