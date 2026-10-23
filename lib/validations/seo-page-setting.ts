@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 export const SEO_CITIES = ["الرياض", "جدة", "الدمام"] as const;
+export const MAX_SECONDARY_KEYWORDS = 150;
+export const MAX_LOCAL_KEYWORDS_PER_CITY = 100;
 
 const plainText = (max: number, label: string) =>
   z
@@ -26,11 +28,13 @@ export const seoPageSettingSchema = z.object({
   seoTitle: plainText(200, "عنوان SEO"),
   seoDescription: plainText(400, "وصف SEO"),
   primaryKeyword: plainText(160, "الكلمة الرئيسية"),
-  secondaryKeywords: z.array(keyword).max(12, "الحد الأقصى 12 كلمة ثانوية"),
+  secondaryKeywords: z
+    .array(keyword)
+    .max(MAX_SECONDARY_KEYWORDS, `الحد الأقصى ${MAX_SECONDARY_KEYWORDS} كلمة ثانوية`),
   localKeywords: z.object({
-    الرياض: z.array(keyword).max(8, "الحد الأقصى 8 عبارات لمدينة الرياض"),
-    جدة: z.array(keyword).max(8, "الحد الأقصى 8 عبارات لمدينة جدة"),
-    الدمام: z.array(keyword).max(8, "الحد الأقصى 8 عبارات لمدينة الدمام"),
+    الرياض: z.array(keyword).max(MAX_LOCAL_KEYWORDS_PER_CITY, `الحد الأقصى ${MAX_LOCAL_KEYWORDS_PER_CITY} عبارة لمدينة الرياض`),
+    جدة: z.array(keyword).max(MAX_LOCAL_KEYWORDS_PER_CITY, `الحد الأقصى ${MAX_LOCAL_KEYWORDS_PER_CITY} عبارة لمدينة جدة`),
+    الدمام: z.array(keyword).max(MAX_LOCAL_KEYWORDS_PER_CITY, `الحد الأقصى ${MAX_LOCAL_KEYWORDS_PER_CITY} عبارة لمدينة الدمام`),
   }),
 });
 

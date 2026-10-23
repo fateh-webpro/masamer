@@ -82,7 +82,7 @@ export function Header({ settings }: HeaderProps) {
       className={cn(
         "sticky top-0 z-40 w-full transition-all duration-300",
         isScrolled
-          ? "bg-white/95 backdrop-blur-md border-b border-(--border-color) shadow-xs py-3"
+          ? "bg-white border-b border-(--border-color) shadow-xs py-3"
           : "bg-transparent py-4 sm:py-5"
       )}
     >

@@ -5,7 +5,10 @@ import { AlertCircle, CheckCircle2, Plus, Save, Search, X } from "lucide-react";
 import { updateSeoPageSettingsAction } from "@/app/admin/site-settings/seo-actions";
 import type { SeoPageTarget } from "@/lib/services/seo-page-setting-dal";
 
-function TagEditor({ label, values, onChange, max = 12 }: { label: string; values: string[]; onChange: (values: string[]) => void; max?: number }) {
+const MAX_SECONDARY_KEYWORDS = 150;
+const MAX_LOCAL_KEYWORDS_PER_CITY = 100;
+
+function TagEditor({ label, values, onChange, max = MAX_SECONDARY_KEYWORDS }: { label: string; values: string[]; onChange: (values: string[]) => void; max?: number }) {
   const [draft, setDraft] = useState("");
   const add = () => {
     const value = draft.trim().replace(/\s+/g, " ");
@@ -20,7 +23,7 @@ function TagEditor({ label, values, onChange, max = 12 }: { label: string; value
         <input value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === ",") { event.preventDefault(); add(); } }} className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-secondary-500 focus:outline-none focus:ring-2 focus:ring-secondary-500/20" placeholder="اكتب العبارة ثم اضغط Enter" maxLength={100} />
         <button type="button" onClick={add} className="inline-flex items-center gap-1 rounded-xl border border-secondary-300 px-3 text-sm font-semibold text-secondary-700 hover:bg-secondary-50" aria-label={`إضافة إلى ${label}`}><Plus className="h-4 w-4" /> إضافة</button>
       </div>
-      {values.length > 0 && <div className="flex flex-wrap gap-2">{values.map((value) => <span key={value} className="inline-flex items-center gap-1 rounded-full bg-secondary-50 px-3 py-1 text-xs font-medium text-secondary-800 ring-1 ring-secondary-200">{value}<button type="button" onClick={() => onChange(values.filter((item) => item !== value))} aria-label={`حذف ${value}`} className="rounded-full p-0.5 hover:bg-secondary-100"><X className="h-3 w-3" /></button></span>)}</div>}
+      {values.length > 0 && <div className="flex max-h-48 flex-wrap gap-2 overflow-y-auto rounded-xl border border-slate-100 p-2">{values.map((value) => <span key={value} className="inline-flex items-center gap-1 rounded-full bg-secondary-50 px-3 py-1 text-xs font-medium text-secondary-800 ring-1 ring-secondary-200">{value}<button type="button" onClick={() => onChange(values.filter((item) => item !== value))} aria-label={`حذف ${value}`} className="rounded-full p-0.5 hover:bg-secondary-100"><X className="h-3 w-3" /></button></span>)}</div>}
       <p className="text-[11px] text-slate-500">{values.length}/{max}</p>
     </div>
   );
@@ -52,7 +55,7 @@ function SeoEditor({ target }: { target: SeoPageTarget }) {
       </div>
       <div><div className="mb-2 flex items-center justify-between"><label htmlFor={`description-${target.pageKey}`} className="text-sm font-semibold text-slate-800">وصف SEO <span className="font-normal text-slate-400">اختياري</span></label><span className="text-xs text-slate-400">{description.length}/400</span></div><textarea id={`description-${target.pageKey}`} name="seoDescription" value={description} onChange={(event) => setDescription(event.target.value)} maxLength={400} rows={4} className="w-full resize-y rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-secondary-500 focus:outline-none focus:ring-2 focus:ring-secondary-500/20" /><p className="mt-1 text-xs text-slate-500">وصف مقترح لمحركات البحث؛ وقد تختار Google نصًا مختلفًا حسب الاستعلام.</p></div>
       <TagEditor label="الكلمات المفتاحية الثانوية" values={secondary} onChange={setSecondary} />
-      <div className="space-y-4 rounded-2xl border border-sand-200 bg-sand-50/50 p-5"><div><h3 className="font-bold text-primary-950">الكلمات المحلية</h3><p className="text-xs text-slate-500">عبارات استهداف تسويقي فقط، ولا تعني وجود فرع أو تغطية تلقائية للمدينة.</p></div><div className="grid gap-5 lg:grid-cols-3">{(["الرياض", "جدة", "الدمام"] as const).map((city) => <TagEditor key={city} label={city} max={8} values={local[city]} onChange={(values) => setLocal((current) => ({ ...current, [city]: values }))} />)}</div></div>
+      <div className="space-y-4 rounded-2xl border border-sand-200 bg-sand-50/50 p-5"><div><h3 className="font-bold text-primary-950">الكلمات المحلية</h3><p className="text-xs text-slate-500">عبارات استهداف تسويقي فقط، ولا تعني وجود فرع أو تغطية تلقائية للمدينة.</p></div><div className="grid gap-5 lg:grid-cols-3">{(["الرياض", "جدة", "الدمام"] as const).map((city) => <TagEditor key={city} label={city} max={MAX_LOCAL_KEYWORDS_PER_CITY} values={local[city]} onChange={(values) => setLocal((current) => ({ ...current, [city]: values }))} />)}</div></div>
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><span className="text-xs text-emerald-700">{canonical}</span><h3 className="mt-1 text-xl font-medium text-[#1a0dab]">{shownTitle}</h3><p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{shownDescription}</p><p className="mt-3 text-[11px] text-slate-400">معاينة تقريبية؛ قد تعرض Google عنوانًا أو وصفًا مختلفًا.</p></div>
       <button type="submit" disabled={pending} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-950 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-900 disabled:cursor-not-allowed disabled:opacity-60"><Save className="h-4 w-4" />{pending ? "جاري الحفظ..." : "حفظ إعدادات الصفحة"}</button>
     </form>
