@@ -78,14 +78,15 @@ export function Header({ settings }: HeaderProps) {
   };
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-300",
-        isScrolled
-          ? "bg-white border-b border-(--border-color) shadow-xs py-3"
-          : "bg-transparent py-4 sm:py-5"
-      )}
-    >
+    <>
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-[60] w-full bg-white transition-all duration-300",
+          isScrolled
+            ? "border-b border-(--border-color) shadow-xs py-3"
+            : "py-4 sm:py-5"
+        )}
+      >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex items-center justify-between">
           {/* Brand / Logo */}
@@ -260,6 +261,8 @@ export function Header({ settings }: HeaderProps) {
           </div>
         </div>
       </div>
-    </header>
+      </header>
+      <div className="h-[72px] sm:h-[88px]" aria-hidden="true" />
+    </>
   );
 }

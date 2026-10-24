@@ -57,7 +57,9 @@ function SeoEditor({ target }: { target: SeoPageTarget }) {
       <TagEditor label="الكلمات المفتاحية الثانوية" values={secondary} onChange={setSecondary} />
       <div className="space-y-4 rounded-2xl border border-sand-200 bg-sand-50/50 p-5"><div><h3 className="font-bold text-primary-950">الكلمات المحلية</h3><p className="text-xs text-slate-500">عبارات استهداف تسويقي فقط، ولا تعني وجود فرع أو تغطية تلقائية للمدينة.</p></div><div className="grid gap-5 lg:grid-cols-3">{(["الرياض", "جدة", "الدمام"] as const).map((city) => <TagEditor key={city} label={city} max={MAX_LOCAL_KEYWORDS_PER_CITY} values={local[city]} onChange={(values) => setLocal((current) => ({ ...current, [city]: values }))} />)}</div></div>
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><span className="text-xs text-emerald-700">{canonical}</span><h3 className="mt-1 text-xl font-medium text-[#1a0dab]">{shownTitle}</h3><p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{shownDescription}</p><p className="mt-3 text-[11px] text-slate-400">معاينة تقريبية؛ قد تعرض Google عنوانًا أو وصفًا مختلفًا.</p></div>
-      <button type="submit" disabled={pending} className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-950 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-900 disabled:cursor-not-allowed disabled:opacity-60"><Save className="h-4 w-4" />{pending ? "جاري الحفظ..." : "حفظ إعدادات الصفحة"}</button>
+      <div className="flex justify-end border-t border-slate-100 pt-5">
+        <button type="submit" disabled={pending} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-950 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-900 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"><Save className="h-4 w-4" />{pending ? "جاري الحفظ..." : "حفظ إعدادات SEO"}</button>
+      </div>
     </form>
   );
 }
